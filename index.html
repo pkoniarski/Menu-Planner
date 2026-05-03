@@ -560,6 +560,7 @@
           <div class="form-group">
             <label for="tripLength">Trip Length (days)</label>
             <input type="number" id="tripLength" min="1" max="14" value="2">
+            <small id="dayLockNote" style="display:none; color:var(--scout-red); margin-top:4px; font-style:italic;">⚜ Day Camping is locked to a single day.</small>
           </div>
           <div class="form-group">
             <label for="patrolName">Patrol Name <span style="font-weight:normal;text-transform:none;color:#888;">(optional)</span></label>
@@ -1058,6 +1059,68 @@ const RECIPES = {
       { name: "Dutch Oven Chicken Enchiladas", violates: ["vegetarian","vegan","pescatarian","dairy-free","gluten-free"],
         howto: "Mix cooked chicken with half the sauce, beans, onions. Fill tortillas, roll, pack in greased Dutch oven. Cover with remaining sauce and cheese. Bake 8/16 coals 25 min.",
         ingredients: ["Flour tortillas", "Cooked chicken", "Enchilada sauce", "Cheese", "Black beans", "Onions"] }
+    ],
+    Dessert: [
+      { name: "Dutch Oven Peach Cobbler", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pour 2 cans peach pie filling into greased 12\" Dutch oven. Sprinkle 1 box yellow cake mix evenly on top. Slice 1 stick butter into pats and scatter across the cake mix. Bake with 8 coals on bottom, 16 on lid for 35-40 min until top is golden and bubbly. Serve warm — a Scout campfire classic.",
+        ingredients: ["Canned peach pie filling (2)", "Yellow cake mix", "Butter (1 stick)"] },
+      { name: "Dutch Oven Apple Crisp", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Slice 6 apples; toss with 1/2 cup sugar and 1 tsp cinnamon in greased Dutch oven. Mix 1 cup oats, 1/2 cup flour, 1/2 cup brown sugar, 1/2 cup melted butter; sprinkle over apples. Bake 8/16 coals 30-35 min until topping is golden.",
+        ingredients: ["Apples (6)", "Sugar", "Cinnamon", "Rolled oats", "Flour", "Brown sugar", "Butter"] },
+      { name: "Campfire S'mores", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Roast a marshmallow on a stick over glowing coals (not flames) until golden brown all over. Sandwich with a square of chocolate between two graham crackers. Press until chocolate softens. Eat immediately — the Patriarch of all camp desserts.",
+        ingredients: ["Graham crackers", "Marshmallows", "Chocolate bars (Hershey's)"] },
+      { name: "Dutch Oven Berry Cobbler", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pour 2 cans mixed berry pie filling into greased Dutch oven. Sprinkle white cake mix evenly on top. Top with butter pats. Bake 8/16 coals 35-40 min until top is golden and fruit bubbles up the sides.",
+        ingredients: ["Canned berry pie filling (2)", "White cake mix", "Butter (1 stick)"] },
+      { name: "Banana Boats", violates: ["vegan","dairy-free"],
+        howto: "Slit each unpeeled banana lengthwise — don't cut all the way through. Stuff with mini marshmallows and chocolate chips. Wrap in foil. Place in coals 5-7 min until chocolate melts. Eat with a spoon directly from the peel.",
+        ingredients: ["Bananas", "Chocolate chips", "Mini marshmallows", "Foil"] },
+      { name: "Dutch Oven Brownies", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Mix brownie batter per box directions (eggs, oil, water). Pour into greased Dutch oven lined with parchment. Bake 8/14 coals 25-30 min until edges pull away. Cool 10 min before cutting into squares.",
+        ingredients: ["Brownie mix", "Eggs", "Vegetable oil"] },
+      { name: "Dutch Oven Baked Cinnamon Apples", violates: ["vegan","dairy-free"],
+        howto: "Core 6 apples, place in greased Dutch oven. Stuff cores with brown sugar and cinnamon, top each with a butter pat. Pour 1/2 cup apple cider into the bottom. Bake 8/14 coals 25-30 min until tender. Spoon juices over apples.",
+        ingredients: ["Apples (6)", "Brown sugar", "Cinnamon", "Butter", "Apple cider"] },
+      { name: "Mountain Dew Cake (Dump Cake)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pour 2 cans pineapple chunks (with juice) into greased Dutch oven. Sprinkle 1 box yellow cake mix evenly on top. Pour 1 can lemon-lime soda over the top — DO NOT STIR. Dot with butter. Bake 8/14 coals 30-35 min.",
+        ingredients: ["Canned pineapple chunks (2)", "Yellow cake mix", "Lemon-lime soda", "Butter"] },
+      { name: "Dutch Oven Pineapple Upside-Down Cake", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Melt 1/2 stick butter in Dutch oven, sprinkle 1/2 cup brown sugar. Arrange pineapple rings with maraschino cherries in their centers. Pour prepared yellow cake batter over top. Bake 8/14 coals 30 min. Flip onto a plate when cool enough to handle.",
+        ingredients: ["Pineapple rings (canned)", "Maraschino cherries", "Yellow cake mix", "Eggs", "Oil", "Butter", "Brown sugar"] },
+      { name: "Dutch Oven Cherry Cobbler", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pour 2 cans cherry pie filling into greased Dutch oven. Sprinkle white cake mix evenly across the top. Dot with butter pats. Bake 8/16 coals 35-40 min until golden and bubbly.",
+        ingredients: ["Canned cherry pie filling (2)", "White cake mix", "Butter"] },
+      { name: "Foil Pack Apple Crumble", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "On a foil square: pile sliced apples, sprinkle brown sugar, cinnamon, and a crumble of oats/flour/butter. Wrap tightly in 2 layers. Cook in medium coals 12-15 min, flipping once. Open carefully — steam.",
+        ingredients: ["Apples", "Brown sugar", "Cinnamon", "Oats", "Flour", "Butter", "Foil"] },
+      { name: "Roasted Marshmallows", violates: ["vegan"],
+        howto: "Skewer marshmallow on a green stick or metal skewer. Hold over glowing coals (not flames) — rotate slowly until golden brown all over, or torch the outside black if that's your style. The most basic Scout dessert.",
+        ingredients: ["Marshmallows"] },
+      { name: "Dutch Oven Pumpkin Spice Cake", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Mix 1 box spice cake with 1 can pumpkin puree only — no eggs or oil needed. Pour into greased Dutch oven. Bake 8/14 coals 30 min until set. Drizzle cream cheese frosting if available.",
+        ingredients: ["Spice cake mix", "Canned pumpkin puree", "Cream cheese frosting (optional)"] },
+      { name: "Campfire Pies (Pie Iron)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Butter outside of two bread slices. Place one in greased pie iron, top with pie filling, close with second slice butter-out. Lock pie iron, hold over coals 3-4 min per side until golden. Cool slightly before eating — filling is molten.",
+        ingredients: ["Bread", "Butter", "Pie filling (cherry, apple, or blueberry)", "Pie iron"] },
+      { name: "Grilled Pound Cake w/ Berries", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Slice store-bought pound cake into 1\"-thick pieces. Grill on lightly buttered griddle 1-2 min per side until golden grill marks form. Top with fresh berries and a dollop of whipped cream.",
+        ingredients: ["Pound cake (loaf)", "Fresh berries", "Whipped cream", "Butter"] },
+      { name: "Skillet Chocolate Chip Cookie", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Press refrigerated cookie dough into greased cast iron skillet (or 10\" Dutch oven). Bake 8/14 coals 18-22 min — edges set, middle still gooey. Top with vanilla ice cream from the cooler. Eat with spoons.",
+        ingredients: ["Refrigerated cookie dough", "Vanilla ice cream (optional)"] },
+      { name: "Dutch Oven Cinnamon Roll Cake", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Press 2 cans of refrigerated cinnamon roll dough into greased Dutch oven. Drizzle with extra cinnamon-sugar and butter pats. Bake 8/16 coals 25 min until golden through. Drizzle the included icing over the top.",
+        ingredients: ["Refrigerated cinnamon rolls (2 cans)", "Brown sugar", "Cinnamon", "Butter"] },
+      { name: "Foil Banana Splits", violates: ["vegan","dairy-free","gluten-free","nut-allergy"],
+        howto: "Slit banana lengthwise (peel still on). Stuff with chocolate chips, mini marshmallows, and chopped nuts. Wrap in foil. Heat in coals 5-7 min. Open carefully — eat with a spoon.",
+        ingredients: ["Bananas", "Chocolate chips", "Mini marshmallows", "Chopped nuts", "Foil"] },
+      { name: "Campfire Cones", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Fill a sugar waffle cone with mini marshmallows, chocolate chips, banana slices, and berries. Wrap in foil. Heat in coals 5 min until everything melts together. Peel back the foil and eat with a spoon.",
+        ingredients: ["Sugar waffle cones", "Mini marshmallows", "Chocolate chips", "Bananas", "Strawberries", "Foil"] },
+      { name: "Dutch Oven Bread Pudding", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Cube 1 loaf bread into greased Dutch oven. Whisk 4 eggs, 2 cups milk, 1/2 cup sugar, 1 tsp vanilla, 1 tsp cinnamon; pour over bread. Let soak 15 min. Bake 8/16 coals 35-40 min until set. Drizzle warm caramel sauce on top.",
+        ingredients: ["Bread (1 loaf)", "Eggs (4)", "Milk", "Sugar", "Vanilla extract", "Cinnamon", "Caramel sauce"] }
     ]
   },
   daycamping: {
@@ -1335,6 +1398,28 @@ function selectCampout(el) {
   document.querySelectorAll('.campout-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   state.campoutType = el.dataset.type;
+
+  // Day Camping is locked to a single day
+  const tripLengthInput = document.getElementById('tripLength');
+  const dayNote = document.getElementById('dayLockNote');
+  if (state.campoutType === 'daycamping') {
+    tripLengthInput.value = 1;
+    tripLengthInput.max = 1;
+    tripLengthInput.min = 1;
+    tripLengthInput.disabled = true;
+    if (dayNote) dayNote.style.display = 'block';
+  } else {
+    tripLengthInput.max = 14;
+    tripLengthInput.min = 1;
+    tripLengthInput.disabled = false;
+    if (dayNote) dayNote.style.display = 'none';
+  }
+}
+
+/* Returns meal slot order for a campout type. Car camping adds Dessert. */
+function getMealsForType(type) {
+  if (type === 'carcamping') return ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
+  return ['Breakfast', 'Lunch', 'Dinner'];
 }
 
 function goToStep(n) {
@@ -1385,7 +1470,7 @@ function buildDayBlocks() {
      <strong>Dietary:</strong> ${dietTags}${allergyLabel}`;
 
   container.innerHTML = '';
-  const meals = ['Breakfast', 'Lunch', 'Dinner'];
+  const meals = getMealsForType(type);
 
   for (let d = 1; d <= state.days; d++) {
     const dayBlock = document.createElement('div');
@@ -1395,13 +1480,15 @@ function buildDayBlocks() {
       const defaultChecked = !(d === 1 && meal === 'Breakfast' && type !== 'daycamping') ? 'checked' : '';
       const recipeList = recipes[meal];
       const defaultIdx = findFirstValidRecipeIndex(recipeList, state.diets);
-      const options = recipeList.map((r, i) => {
+      const noneOption = `<option value="-1">— None (skip this ${meal.toLowerCase()}) —</option>`;
+      const recipeOptions = recipeList.map((r, i) => {
         const violates = recipeViolatesDiets(r, state.diets);
         const disabled = violates ? 'disabled' : '';
         const suffix = violates ? ' ⚠ (restricted)' : '';
         const selected = (i === defaultIdx) ? 'selected' : '';
         return `<option value="${i}" ${disabled} ${selected}>${r.name}${suffix}</option>`;
       }).join('');
+      const options = noneOption + recipeOptions;
       const slotId = `slot-${d}-${meal}`;
       html += `
         <div class="meal-slot" data-day="${d}" data-meal="${meal}" id="${slotId}">
@@ -1432,8 +1519,13 @@ function toggleHowto(slotId) {
   const slot = document.getElementById(slotId);
   const select = slot.querySelector('select');
   const panel = document.getElementById('howto-' + slotId);
-  const day = slot.dataset.day, meal = slot.dataset.meal;
+  const meal = slot.dataset.meal;
   const idx = parseInt(select.value);
+  if (idx < 0) {
+    panel.innerHTML = `<strong>No recipe — this ${meal.toLowerCase()} is set to "None".</strong><br>Pick a recipe from the dropdown to see cooking instructions.`;
+    panel.classList.add('visible');
+    return;
+  }
   const recipe = RECIPES[state.campoutType][meal][idx];
   panel.innerHTML = `<strong>${recipe.name} — Cooking Instructions:</strong><br>${recipe.howto}`;
   panel.classList.toggle('visible');
@@ -1444,9 +1536,11 @@ function captureMeals() {
   document.querySelectorAll('.meal-slot').forEach(slot => {
     const d = slot.dataset.day;
     const m = slot.dataset.meal;
-    const enabled = slot.querySelector('input[type="checkbox"]').checked;
+    const checkboxChecked = slot.querySelector('input[type="checkbox"]').checked;
     const idx = parseInt(slot.querySelector('select').value);
-    const recipe = RECIPES[state.campoutType][m][idx];
+    const recipe = (idx >= 0) ? RECIPES[state.campoutType][m][idx] : null;
+    // A meal is active only if checkbox is checked AND a real recipe (not "None") is chosen
+    const enabled = checkboxChecked && recipe !== null;
     if (!state.meals[d]) state.meals[d] = {};
     state.meals[d][m] = { enabled, recipe };
   });
@@ -1458,9 +1552,10 @@ function buildMenuReview() {
                   : state.campoutType === 'carcamping' ? 'Car Camping' : 'Day Camping';
   let html = `<h3>⚜ ${state.patrolName ? state.patrolName + ' — ' : ''}${typeLabel} · ${state.people} Scouts · ${state.days} day(s) ⚜</h3>`;
 
+  const mealsForType = getMealsForType(state.campoutType);
   for (let d = 1; d <= state.days; d++) {
     html += `<div class="day-block"><div class="day-header">⚜ Day ${d} ⚜</div>`;
-    ['Breakfast', 'Lunch', 'Dinner'].forEach(meal => {
+    mealsForType.forEach(meal => {
       const m = state.meals[d] && state.meals[d][meal];
       if (m && m.enabled) {
         html += `<div class="recipe-card">
@@ -1583,9 +1678,10 @@ function buildShoppingList() {
 
   html += `<div class="shopping-section" style="background:#f7f4ea;">
     <h3 style="color:var(--scout-olive-dark);">📖 Full Recipe Card (print with the shopping list)</h3>`;
+  const mealsForRecipeCard = getMealsForType(state.campoutType);
   for (let d = 1; d <= state.days; d++) {
     html += `<h4 style="color:var(--scout-red); font-family:'Copperplate',serif; letter-spacing:1px; margin-top:12px;">⚜ Day ${d} ⚜</h4>`;
-    ['Breakfast', 'Lunch', 'Dinner'].forEach(meal => {
+    mealsForRecipeCard.forEach(meal => {
       const m = state.meals[d] && state.meals[d][meal];
       if (m && m.enabled) {
         html += `<div class="recipe-card">
