@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Menu Planner — A Scout Trail Chef's Kitchen</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --scout-khaki: #c9b682;
+    --scout-olive: #4a5d23;
+    --scout-olive-dark: #2f3d16;
+    --scout-red: #ce1126;
+    --scout-gold: #d4a017;
+    --scout-navy: #002147;
+    --scout-tan: #f5ecd7;
+    --scout-brown: #5c3a21;
+    --scout-cream: #faf5e6;
+    --wood: #8b5a2b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', 'Palatino Linotype', serif;
+    background: var(--scout-cream);
+    color: var(--scout-olive-dark);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(74,93,35,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(92,58,33,0.04) 0%, transparent 40%);
+  }
+  header.campfire {
+    background: linear-gradient(135deg, var(--scout-olive-dark) 0%, var(--scout-olive) 100%);
+    color: var(--scout-tan);
+    padding: 28px 20px;
+    text-align: center;
+    border-bottom: 6px double var(--scout-gold);
+    position: relative;
+  }
+  header.campfire h1 {
+    font-family: 'Copperplate', 'Trajan Pro', Georgia, serif;
+    font-size: 2.6em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 6px 0;
+    text-shadow: 2px 2px 0 var(--scout-olive-dark);
+  }
+  header.campfire .motto {
+    font-style: italic;
+    font-size: 1.1em;
+    color: var(--scout-gold);
+    letter-spacing: 2px;
+  }
+  .fleur {
+    display: inline-block;
+    color: var(--scout-gold);
+    font-size: 1.2em;
+    vertical-align: middle;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+  .panel {
+    background: #fffdf6;
+    border: 2px solid var(--scout-olive);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px dashed var(--scout-khaki);
+    border-radius: 5px;
+    pointer-events: none;
+  }
+  .panel-content { position: relative; z-index: 1; }
+  h2.badge-title {
+    font-family: 'Copperplate', Georgia, serif;
+    color: var(--scout-olive-dark);
+    border-bottom: 3px solid var(--scout-gold);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 1.4em;
+  }
+  h3 {
+    color: var(--scout-brown);
+    font-family: 'Copperplate', Georgia, serif;
+    letter-spacing: 1px;
+    margin: 16px 0 10px;
+  }
+  .quote {
+    background: var(--scout-tan);
+    border-left: 5px solid var(--scout-red);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-style: italic;
+    color: var(--scout-olive-dark);
+    border-radius: 4px;
+  }
+  .quote strong { color: var(--scout-red); font-style: normal; }
+  .prayer {
+    background: linear-gradient(to right, var(--scout-cream), #fff);
+    border: 1px solid var(--scout-khaki);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    text-align: center;
+    font-style: italic;
+    color: var(--scout-olive-dark);
+  }
+  .prayer .prayer-title {
+    display: block;
+    font-family: 'Copperplate', serif;
+    font-style: normal;
+    color: var(--scout-red);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    font-size: 0.9em;
+  }
+
+  .campout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .campout-card {
+    background: #fffdf6;
+    border: 3px solid var(--scout-olive);
+    border-radius: 10px;
+    padding: 24px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .campout-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--scout-red);
+    box-shadow: 0 8px 20px rgba(206,17,38,0.2);
+  }
+  .campout-card.selected {
+    background: var(--scout-olive);
+    color: var(--scout-tan);
+    border-color: var(--scout-gold);
+  }
+  .campout-card.selected .campout-icon { color: var(--scout-gold); }
+  .campout-icon {
+    font-size: 3em;
+    color: var(--scout-olive);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .campout-card h3 { color: inherit; margin: 6px 0; }
+  .campout-card p { font-size: 0.9em; opacity: 0.85; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .form-group { display: flex; flex-direction: column; }
+  label {
+    font-weight: bold;
+    color: var(--scout-brown);
+    margin-bottom: 6px;
+    font-family: 'Copperplate', serif;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+  }
+  input[type="number"], input[type="text"], select {
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid var(--scout-khaki);
+    border-radius: 4px;
+    background: #fff;
+    font-family: Georgia, serif;
+  }
+  input[type="number"]:focus, select:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--scout-red);
+  }
+  .diet-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .diet-check {
+    display: flex;
+    align-items: center;
+    background: var(--scout-tan);
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--scout-khaki);
+    cursor: pointer;
+  }
+  .diet-check input { margin-right: 6px; }
+
+  .btn {
+    background: var(--scout-red);
+    color: #fff;
+    border: none;
+    padding: 12px 26px;
+    font-size: 1.05em;
+    font-family: 'Copperplate', Georgia, serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  }
+  .btn:hover { background: #a50f1e; transform: translateY(-1px); }
+  .btn-secondary { background: var(--scout-olive); }
+  .btn-secondary:hover { background: var(--scout-olive-dark); }
+  .btn-gold { background: var(--scout-gold); color: var(--scout-olive-dark); }
+  .btn-gold:hover { background: #b8880f; }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+
+  .day-block {
+    border: 2px solid var(--scout-khaki);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 20px;
+    background: #fffdf6;
+  }
+  .day-header {
+    background: var(--scout-olive);
+    color: var(--scout-tan);
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-family: 'Copperplate', serif;
+    letter-spacing: 2px;
+    margin: -18px -18px 14px -18px;
+    border-radius: 6px 6px 0 0;
+  }
+  .meal-slot {
+    display: grid;
+    grid-template-columns: auto 140px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--scout-khaki);
+  }
+  .meal-slot:last-child { border-bottom: none; }
+  .meal-slot input[type="checkbox"] {
+    width: 22px; height: 22px;
+    accent-color: var(--scout-olive);
+    cursor: pointer;
+  }
+  .meal-label {
+    font-family: 'Copperplate', serif;
+    color: var(--scout-brown);
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+  .meal-slot select { width: 100%; }
+  .meal-slot.unchecked select,
+  .meal-slot.unchecked .view-recipe-btn { opacity: 0.4; pointer-events: none; }
+  .meal-slot.unchecked .meal-label { text-decoration: line-through; opacity: 0.5; }
+  .meal-slot select option:disabled {
+    color: #aaa;
+    background: #f2f2f2;
+    font-style: italic;
+  }
+  .view-recipe-btn {
+    background: var(--scout-gold);
+    color: var(--scout-olive-dark);
+    border: none;
+    padding: 6px 10px;
+    font-size: 0.85em;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Copperplate', serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .view-recipe-btn:hover { background: #b8880f; }
+  .recipe-howto {
+    grid-column: 1 / -1;
+    background: var(--scout-tan);
+    border-left: 4px solid var(--scout-olive);
+    padding: 12px 16px;
+    margin-top: 6px;
+    border-radius: 4px;
+    display: none;
+    font-size: 0.95em;
+  }
+  .recipe-howto.visible { display: block; animation: fadeIn 0.3s ease; }
+  .recipe-howto strong { color: var(--scout-red); font-family: 'Copperplate', serif; letter-spacing: 1px; }
+
+  .shopping-section {
+    margin: 20px 0;
+    background: #fffdf6;
+    border: 1px solid var(--scout-khaki);
+    border-radius: 6px;
+    padding: 16px 20px;
+  }
+  .shopping-section h3 {
+    color: var(--scout-red);
+    border-bottom: 2px dashed var(--scout-gold);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .shopping-list {
+    columns: 2;
+    column-gap: 30px;
+    list-style: none;
+  }
+  .shopping-list li {
+    padding: 4px 0 4px 24px;
+    position: relative;
+    break-inside: avoid;
+  }
+  .shopping-list li::before {
+    content: "☐";
+    position: absolute;
+    left: 0;
+    color: var(--scout-olive);
+    font-size: 1.2em;
+    line-height: 1;
+  }
+  @media (max-width: 600px) {
+    .shopping-list { columns: 1; }
+    .meal-slot { grid-template-columns: auto 1fr; }
+    .meal-slot select, .meal-slot .view-recipe-btn { grid-column: 1 / -1; }
+  }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform: none;} }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--scout-brown);
+    border-top: 3px double var(--scout-olive);
+    margin-top: 40px;
+    font-style: italic;
+  }
+  .trefoil { color: var(--scout-gold); font-size: 1.5em; }
+  .stepper {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0 20px;
+    flex-wrap: wrap;
+  }
+  .stepper .dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--scout-khaki);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+    border: 2px solid var(--scout-olive);
+  }
+  .stepper .dot.active {
+    background: var(--scout-red);
+    border-color: var(--scout-gold);
+    transform: scale(1.1);
+  }
+  .summary-tag {
+    display: inline-block;
+    background: var(--scout-olive);
+    color: var(--scout-tan);
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin: 3px;
+    font-size: 0.85em;
+  }
+  .recipe-card {
+    background: #fffdf6;
+    border: 1px solid var(--scout-khaki);
+    border-left: 5px solid var(--scout-gold);
+    padding: 12px 16px;
+    margin: 10px 0;
+    border-radius: 4px;
+  }
+  .recipe-card .recipe-meal {
+    color: var(--scout-red);
+    font-weight: bold;
+    font-family: 'Copperplate', serif;
+    letter-spacing: 1px;
+  }
+  .recipe-card .recipe-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--scout-olive-dark);
+    display: block;
+    margin: 4px 0;
+  }
+  .recipe-card .recipe-instructions {
+    margin-top: 6px;
+    color: #444;
+    line-height: 1.5;
+  }
+
+  /* Patrol Box / Kitchen Gear interactive checklist */
+  .patrol-checklist {
+    list-style: none;
+    padding: 0;
+    columns: 2;
+    column-gap: 30px;
+    margin: 8px 0;
+  }
+  .patrol-checklist li {
+    break-inside: avoid;
+    padding: 4px 0;
+  }
+  .patrol-checklist label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.97em;
+    color: var(--scout-olive-dark);
+    line-height: 1.4;
+  }
+  .patrol-checklist input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--scout-olive);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .patrol-checklist input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: #999;
+    font-style: italic;
+  }
+  .patrol-counter {
+    display: inline-block;
+    background: var(--scout-olive);
+    color: var(--scout-tan);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-family: 'Copperplate', serif;
+    letter-spacing: 1px;
+    margin-left: 8px;
+  }
+  @media (max-width: 600px) {
+    .patrol-checklist { columns: 1; }
+  }
+
+  /* ============ PRINT STYLES ============ */
+  @media print {
+    @page { margin: 0.5in; }
+    body {
+      background: white !important;
+      color: black !important;
+      font-size: 11pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body::before {
+      content: "⚜ My Menu Planner — Patrol Quartermaster's Sheet ⚜";
+      display: block;
+      text-align: center;
+      font-family: 'Copperplate', Georgia, serif;
+      font-size: 14pt;
+      font-weight: bold;
+      padding-bottom: 8pt;
+      border-bottom: 2pt solid black;
+      margin-bottom: 12pt;
+    }
+    header.campfire, footer, .stepper, .btn, .btn-row,
+    #step1, #step2, #step3 { display: none !important; }
+    #step4 { display: block !important; }
+    .panel {
+      border: 1pt solid black !important;
+      box-shadow: none !important;
+      padding: 10pt !important;
+      margin-bottom: 10pt !important;
+      page-break-inside: avoid;
+    }
+    .panel::before { display: none !important; }
+    .shopping-section {
+      border: 1pt solid #333 !important;
+      page-break-inside: avoid;
+      margin: 8pt 0 !important;
+      padding: 8pt 10pt !important;
+    }
+    .shopping-section h3 { color: black !important; border-bottom: 1pt dashed #333 !important; }
+    .quote, .prayer {
+      border: 1pt solid #666 !important;
+      background: #f5f5f5 !important;
+      page-break-inside: avoid;
+      padding: 6pt 10pt !important;
+    }
+    h2.badge-title { color: black !important; border-bottom: 2pt solid black !important; }
+    h3 { color: black !important; }
+    .shopping-list { columns: 2; column-gap: 20pt; }
+    .shopping-list li::before { color: black !important; }
+    .summary-tag { background: #eee !important; color: black !important; border: 1pt solid #666; }
+  }
+</style>
+</head>
+<body>
+
+<header class="campfire">
+  <div class="fleur" style="font-size:2em;">⚜</div>
+  <h1>My Menu Planner</h1>
+  <div class="motto">☆ Be Prepared — The Trail Chef's Chuck Box ☆</div>
+</header>
+
+<div class="container">
+
+  <div class="stepper">
+    <div class="dot active" id="dot1">1</div>
+    <div class="dot" id="dot2">2</div>
+    <div class="dot" id="dot3">3</div>
+    <div class="dot" id="dot4">4</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section id="step1" class="step active">
+    <div class="panel">
+      <div class="panel-content">
+        <h2 class="badge-title">⚜ Choose Your Trek ⚜</h2>
+        <div class="quote">
+          <strong>"A Scout is Prepared"</strong> — and a prepared Patrol starts with a solid menu. Pick your outing so the Quartermaster knows whether to pack a Jetboil or the Dutch ovens.<br>
+          <em>— Lord Baden-Powell (adapted)</em>
+        </div>
+        <div class="campout-grid">
+          <div class="campout-card" data-type="backpacking" onclick="selectCampout(this)">
+            <span class="campout-icon">🥾</span>
+            <h3>Back Packing</h3>
+            <p>Lightweight, packable, cook on a backpacking stove. Every ounce counts on the trail.</p>
+          </div>
+          <div class="campout-card" data-type="carcamping" onclick="selectCampout(this)">
+            <span class="campout-icon">🏕️</span>
+            <h3>Car Camping</h3>
+            <p>Full Patrol Box, Dutch ovens, coolers. Base camp luxury with campfire cooking.</p>
+          </div>
+          <div class="campout-card" data-type="daycamping" onclick="selectCampout(this)">
+            <span class="campout-icon">🌲</span>
+            <h3>Day Camping</h3>
+            <p>Grab-and-go meals for a single-day outing. Sack lunches and quick bites.</p>
+          </div>
+        </div>
+
+        <h3 style="margin-top:28px;">Patrol Roster & Trip Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="peopleCount"># of Scouts (Patrol Size)</label>
+            <input type="number" id="peopleCount" min="1" max="50" value="8">
+          </div>
+          <div class="form-group">
+            <label for="tripLength">Trip Length (days)</label>
+            <input type="number" id="tripLength" min="1" max="14" value="2">
+          </div>
+          <div class="form-group">
+            <label for="patrolName">Patrol Name <span style="font-weight:normal;text-transform:none;color:#888;">(optional)</span></label>
+            <input type="text" id="patrolName" placeholder="e.g. Eagle Patrol">
+          </div>
+        </div>
+
+        <h3 style="margin-top:20px;">Dietary Needs & Food Allergies</h3>
+        <p style="font-size:0.9em;color:#666;margin-bottom:8px;"><em>Meals that violate selected restrictions will be greyed out in the menu dropdowns.</em></p>
+        <div class="diet-checks">
+          <label class="diet-check"><input type="checkbox" value="vegetarian"> Vegetarian</label>
+          <label class="diet-check"><input type="checkbox" value="vegan"> Vegan</label>
+          <label class="diet-check"><input type="checkbox" value="pescatarian"> Pescatarian</label>
+          <label class="diet-check"><input type="checkbox" value="gluten-free"> Gluten-Free</label>
+          <label class="diet-check"><input type="checkbox" value="nut-allergy"> Nut Allergy</label>
+          <label class="diet-check"><input type="checkbox" value="dairy-free"> Dairy-Free</label>
+          <label class="diet-check"><input type="checkbox" value="halal"> Halal</label>
+          <label class="diet-check"><input type="checkbox" value="kosher"> Kosher</label>
+        </div>
+        <div class="form-row" style="margin-top:10px;">
+          <div class="form-group" style="grid-column: 1/-1;">
+            <label for="otherAllergies">Other Allergies / Notes</label>
+            <input type="text" id="otherAllergies" placeholder="e.g. shellfish, soy, eggs">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" onclick="goToStep(2)">Advance to Mess Hall ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step2" class="step">
+    <div class="panel">
+      <div class="panel-content">
+        <h2 class="badge-title">⚜ Plan the Mess Hall ⚜</h2>
+        <div class="prayer">
+          <span class="prayer-title">☆ The Philmont Grace ☆</span>
+          For food, for raiment,<br>
+          For life, for opportunity,<br>
+          For friendship and fellowship,<br>
+          We thank thee, O Lord.<br>
+          <em>— Amen —</em>
+        </div>
+        <p id="tripSummary" style="padding:10px; background:var(--scout-tan); border-radius:4px; margin-bottom:16px;"></p>
+        <p style="margin-bottom: 10px;"><strong>Quartermaster's note:</strong> Uncheck any meal the Patrol plans to skip. Tap "View Recipe" to see cooking instructions. Greyed-out options violate your selected dietary restrictions.</p>
+        <div id="daysContainer"></div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goToStep(1)">◀ Back to Trailhead</button>
+          <button class="btn" onclick="goToStep(3)">Review Menu ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step3" class="step">
+    <div class="panel">
+      <div class="panel-content">
+        <h2 class="badge-title">⚜ The Patrol's Bill of Fare ⚜</h2>
+        <div class="quote">
+          <strong>"A Scout is kind, cheerful, thrifty, and clean."</strong> — and that goes double in the Chuck Box. A tidy menu makes a happy Patrol.
+        </div>
+        <div class="prayer">
+          <span class="prayer-title">☆ The Scout Grace ☆</span>
+          For food, for friends, and fellowship good,<br>
+          For love and care along the way,<br>
+          We give thanks, O Lord, this day.<br>
+          <em>— Amen —</em>
+        </div>
+        <div id="menuReview"></div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goToStep(2)">◀ Edit Menu</button>
+          <button class="btn btn-gold" onclick="goToStep(4)">Generate Shopping List ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section id="step4" class="step">
+    <div class="panel">
+      <div class="panel-content">
+        <h2 class="badge-title">⚜ Quartermaster's Shopping List ⚜</h2>
+        <div class="quote">
+          <strong>"Leave no trace, take no shortcuts, forget no bacon."</strong> — Old Scoutmaster saying
+        </div>
+        <div class="prayer">
+          <span class="prayer-title">☆ Johnny Appleseed Grace ☆</span>
+          Oh, the Lord is good to me,<br>
+          And so I thank the Lord,<br>
+          For giving me the things I need,<br>
+          The sun, and the rain, and the appleseed.<br>
+          The Lord is good to me.<br>
+          <em>— Amen —</em>
+        </div>
+        <div id="shoppingOutput"></div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" type="button" onclick="goToStep(3)">◀ Back to Menu</button>
+          <button class="btn btn-gold" type="button" onclick="doPrint()">🖨️ Print</button>
+          <button class="btn btn-gold" type="button" onclick="doPDF()">📄 Save PDF</button>
+          <button class="btn" type="button" onclick="resetAll()">↺ Start New Trek</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="trefoil">⚜</div>
+  <p>"On my honor, I will do my best..." <br>
+  — Hike your own hike, cook with care, and leave it better than you found it. —</p>
+  <p style="margin-top:8px; font-size:0.9em;">⚜ BSA-Inspired Trail Chef Menu Planner ⚜</p>
+</footer>
+
+<script>
+/* ============== RECIPE DATABASE ==============
+   Each recipe: { name, violates: [diet codes], howto: instructions, ingredients: [] }
+   Diet codes: vegetarian, vegan, pescatarian, gluten-free, nut-allergy, dairy-free, halal, kosher
+*/
+const RECIPES = {
+  backpacking: {
+    Breakfast: [
+      { name: "Instant Oatmeal w/ Dried Fruit & Brown Sugar", violates: ["gluten-free"],
+        howto: "Boil 1 cup water per Scout. Tear open oatmeal packets into mugs, pour in hot water, stir. Top with dried fruit and a brown sugar packet. Let stand 1-2 minutes to thicken.",
+        ingredients: ["Instant oatmeal packets", "Dried fruit mix", "Brown sugar packets"] },
+      { name: "Granola w/ Powdered Milk (cold-soaked)", violates: ["gluten-free"],
+        howto: "Combine granola and 2 Tbsp powdered milk per Scout in a freezer bag. At breakfast, add 1 cup cold water, shake, and eat from bag. Best prepped the night before.",
+        ingredients: ["Granola", "Powdered milk", "Freezer bags"] },
+      { name: "Dehydrated Breakfast Skillet (Mountain House)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Boil 2 cups water. Open pouch, pour in hot water, stir thoroughly. Reseal and wait 9 minutes. Fluff with spork and eat directly from pouch.",
+        ingredients: ["Mountain House Breakfast Skillet pouches"] },
+      { name: "Peanut Butter & Honey Tortilla Wrap", violates: ["gluten-free","nut-allergy"],
+        howto: "Spread 2 Tbsp peanut butter across a tortilla, drizzle with honey packet. Roll tightly. No cooking required — a trail classic.",
+        ingredients: ["Flour tortillas", "Peanut butter", "Honey packets"] },
+      { name: "Trail Mix Breakfast Bowl", violates: ["nut-allergy"],
+        howto: "Pour 1 cup trail mix into a mug. Add reconstituted powdered milk (or eat dry). Top with extra dried fruit.",
+        ingredients: ["Granola", "Trail mix", "Dried fruit"] },
+      { name: "Instant Grits w/ Bacon Bits", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Boil 3/4 cup water per packet. Stir grits into hot water, sprinkle bacon bits and salt/pepper. Rest 1 minute before eating.",
+        ingredients: ["Instant grits packets", "Bacon bits", "Salt & pepper"] },
+      { name: "Pop-Tarts (Scout Classic)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Open packet. Eat cold, or toast over a warm stove on foil for 30 seconds per side. Scout tradition — pair with instant coffee.",
+        ingredients: ["Pop-Tarts (assorted)"] },
+      { name: "Clif / Lara Breakfast Bars", violates: ["gluten-free","nut-allergy"],
+        howto: "Unwrap. Eat. No cooking required. Pair with instant coffee for maximum trail morale.",
+        ingredients: ["Clif Bars", "Lara Bars"] },
+      { name: "Freeze-Dried Scrambled Eggs w/ Bacon", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Boil water per pouch directions. Pour into pouch, stir, reseal 8-10 minutes. Eat from pouch or scoop into a tortilla for an egg wrap.",
+        ingredients: ["Freeze-dried scrambled egg pouches", "Bacon bits"] },
+      { name: "Cream of Wheat w/ Cinnamon", violates: ["gluten-free"],
+        howto: "Boil 3/4 cup water per packet. Slowly stir in cream of wheat, add cinnamon & sugar. Cook 1 minute stirring constantly to prevent lumps.",
+        ingredients: ["Cream of Wheat packets", "Cinnamon", "Sugar"] },
+      { name: "Cinnamon Raisin Bagel w/ Peanut Butter", violates: ["gluten-free","nut-allergy"],
+        howto: "Pre-slice bagels at home. Spread peanut butter generously. Eat cold — no cooking needed. Toast over stove if desired.",
+        ingredients: ["Cinnamon raisin bagels", "Peanut butter"] },
+      { name: "Instant Coffee & Breakfast Cookie", violates: ["gluten-free","dairy-free","vegan"],
+        howto: "Boil water, stir in instant coffee. Eat the breakfast cookie alongside. Low-fuel, fast trail morning.",
+        ingredients: ["Instant coffee", "Breakfast cookies"] },
+      { name: "Dry Cereal w/ Milk Powder", violates: ["gluten-free"],
+        howto: "Combine cereal and powdered milk in a freezer bag. At breakfast add cold water, stir, and eat from the bag.",
+        ingredients: ["Cereal (Cheerios, granola)", "Powdered milk"] },
+      { name: "Tortilla w/ Nutella & Banana Chips", violates: ["gluten-free","nut-allergy"],
+        howto: "Spread Nutella across tortilla, scatter banana chips. Roll and eat. Quick sugar for cold trail mornings.",
+        ingredients: ["Flour tortillas", "Nutella packets", "Banana chips"] },
+      { name: "Just-Add-Water Pancakes", violates: ["gluten-free","vegan","dairy-free"],
+        howto: "Mix pancake batter with cold water in a freezer bag, snip a corner. Pipe silver-dollar pancakes onto hot greased pan. Flip when bubbles form. Top with syrup.",
+        ingredients: ["Just-add-water pancake mix", "Syrup packets", "Butter packets"] },
+      { name: "Dehydrated Hash Browns w/ Sausage Crumbles", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Rehydrate hash browns with boiling water, let sit 15 min. Drain. Fry in oiled pan with sausage crumbles until crispy (~5 min). Season and serve.",
+        ingredients: ["Dehydrated hash browns", "Sausage crumbles", "Oil"] },
+      { name: "Coconut Chia Pudding (cold-soak overnight)", violates: [],
+        howto: "Combine 3 Tbsp chia seeds, 3 Tbsp coconut milk powder, 1 cup water, and dried mango in a jar. Shake well. Let sit overnight. Eat cold.",
+        ingredients: ["Chia seeds", "Coconut milk powder", "Dried mango"] },
+      { name: "Overnight Oats (cold-soak)", violates: ["gluten-free"],
+        howto: "Mix 1/2 cup oats, 2 Tbsp powdered milk, 1 honey packet, and dried fruit in a jar with 3/4 cup water. Seal overnight. Ready-to-eat cold.",
+        ingredients: ["Rolled oats", "Powdered milk", "Honey packets", "Dried fruit"] },
+      { name: "Muesli w/ Milk Powder & Dried Berries", violates: ["gluten-free"],
+        howto: "Combine muesli, 2 Tbsp milk powder, dried berries in a mug. Add cold water, stir. Eat immediately or let sit 5 minutes for softer texture.",
+        ingredients: ["Muesli", "Powdered milk", "Dried berries"] },
+      { name: "Dehydrated Breakfast Burrito", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Rehydrate pouch contents per directions (~10 min). Spoon filling onto tortilla, roll into a burrito. Add hot sauce if carried.",
+        ingredients: ["Freeze-dried breakfast burrito pouches", "Tortillas"] }
+    ],
+    Lunch: [
+      { name: "Tuna Packet w/ Tortilla & Mayo Packets", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Open tuna packet, squeeze onto a tortilla. Add mayo packet, season with salt & pepper. Roll and eat. Pescatarian-friendly, no heat needed.",
+        ingredients: ["Tuna packets", "Flour tortillas", "Mayo packets"] },
+      { name: "Summer Sausage & Cheddar on Crackers", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Slice summer sausage and cheddar with pocket knife. Layer on crackers. No cooking. A Scouting trail staple.",
+        ingredients: ["Summer sausage", "Cheddar (shelf-stable)", "Crackers"] },
+      { name: "PB&J Tortilla Roll-Up", violates: ["gluten-free","nut-allergy"],
+        howto: "Spread peanut butter and jelly on a tortilla. Roll tight. Pack in a zip bag to prevent squishing. Eat as-is.",
+        ingredients: ["Tortillas", "Peanut butter", "Jelly packets"] },
+      { name: "Dehydrated Hummus Wrap w/ Sun-Dried Tomato", violates: ["gluten-free"],
+        howto: "Mix dehydrated hummus with 1/4 cup water, wait 5 min. Spread on tortilla with sun-dried tomatoes. Roll and eat.",
+        ingredients: ["Dehydrated hummus", "Tortillas", "Sun-dried tomatoes"] },
+      { name: "Salami & Triscuits w/ Mustard", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Slice salami. Layer on Triscuits with a squeeze of mustard. Eat as trail tapas.",
+        ingredients: ["Salami", "Triscuits", "Mustard packets"] },
+      { name: "Chicken Salad Packet Wrap", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Squeeze chicken salad packet onto tortilla, roll, and eat. Shelf-stable and hearty.",
+        ingredients: ["Chicken salad packets", "Tortillas"] },
+      { name: "Cheese & Pepperoni Roll-Up", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Lay pepperoni slices and cheese on tortilla. Roll up tight. Eat cold — the classic trail pizza roll.",
+        ingredients: ["Pepperoni", "Cheese", "Tortillas"] },
+      { name: "Trail Mix & Beef Jerky Combo", violates: ["vegetarian","vegan","pescatarian","halal","nut-allergy"],
+        howto: "Open bag. Eat handful of trail mix, chew jerky. Repeat. No-cook fuel on the move.",
+        ingredients: ["Trail mix", "Beef jerky"] },
+      { name: "Everything Bagel w/ Cream Cheese", violates: ["gluten-free","vegan","dairy-free"],
+        howto: "Pre-slice bagel at home. Spread with shelf-stable cream cheese packet. Eat cold.",
+        ingredients: ["Everything bagels", "Shelf-stable cream cheese"] },
+      { name: "Cold-Soak Ramen w/ Tuna", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Break ramen into a freezer bag with seasoning packet, tuna, and 1 cup cold water. Seal, soak 30-60 min. Eat cold from bag.",
+        ingredients: ["Ramen packets", "Tuna packets"] },
+      { name: "Pita Pocket w/ Tuna Salad", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Mix tuna packet with mayo packet in a mug. Stuff into pita pocket. Eat cold.",
+        ingredients: ["Pita bread", "Tuna packets", "Mayo packets"] },
+      { name: "Dried Fruit & Nuts (GORP)", violates: ["nut-allergy"],
+        howto: "Good Ol' Raisins and Peanuts. Mix in bag: raisins, peanuts, M&Ms, almonds. Eat by the handful.",
+        ingredients: ["Raisins", "Peanuts", "M&Ms", "Almonds"] },
+      { name: "Clif Bar Lunch w/ Electrolyte Drink", violates: ["gluten-free","nut-allergy"],
+        howto: "Unwrap Clif Bar. Mix electrolyte drink powder with 20 oz water in bottle. Eat and drink.",
+        ingredients: ["Clif Bars", "Electrolyte drink mix"] },
+      { name: "Hard Salami & Babybel Cheese", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Slice salami, unwrap Babybel. Eat together — a classic European trail pairing.",
+        ingredients: ["Hard salami", "Babybel cheese"] },
+      { name: "Peanut Butter on Graham Crackers", violates: ["gluten-free","nut-allergy"],
+        howto: "Spread peanut butter between two graham crackers. Press gently. Eat as trail sandwich cookies.",
+        ingredients: ["Graham crackers", "Peanut butter"] },
+      { name: "Beef Jerky & Dried Apricots", violates: ["vegetarian","vegan","pescatarian","halal"],
+        howto: "Rip open bags. Alternate bites of jerky and apricots. No prep.",
+        ingredients: ["Beef jerky", "Dried apricots"] },
+      { name: "Almond Butter & Honey Tortilla", violates: ["gluten-free","nut-allergy"],
+        howto: "Spread almond butter on tortilla, drizzle honey. Roll tightly. Eat cold — sweet and protein-rich.",
+        ingredients: ["Almond butter", "Honey packets", "Tortillas"] },
+      { name: "Cold-Soak Couscous Salad", violates: ["gluten-free"],
+        howto: "Combine couscous, sun-dried tomatoes, spices, olive oil, and 3/4 cup cold water in a bag. Soak 45 min. Eat cold.",
+        ingredients: ["Couscous", "Olive oil packets", "Sun-dried tomatoes", "Spices"] },
+      { name: "Rice Cakes w/ Peanut Butter & Raisins", violates: ["nut-allergy"],
+        howto: "Spread peanut butter on rice cakes, sprinkle raisins on top. Stack two together. Eat — light and crunchy.",
+        ingredients: ["Rice cakes", "Peanut butter", "Raisins"] },
+      { name: "Energy Bar, Nuts & Dried Mango", violates: ["nut-allergy"],
+        howto: "Open, eat. A simple three-part lunch for miles without stopping.",
+        ingredients: ["Energy bars", "Mixed nuts", "Dried mango"] }
+    ],
+    Dinner: [
+      { name: "Mountain House Beef Stroganoff", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Boil 2 cups water. Pour into pouch, stir thoroughly, reseal 9 minutes. Fluff and eat from pouch. Classic backcountry dinner.",
+        ingredients: ["Mountain House Beef Stroganoff pouches"] },
+      { name: "Ramen Bomb w/ Tuna & Cheese", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Boil 2 cups water. Add ramen + seasoning, cook 3 min. Stir in tuna packet and shelf-stable cheese. Rich, hot, calorie-dense.",
+        ingredients: ["Ramen packets", "Tuna packets", "Cheese"] },
+      { name: "Instant Mashed Potatoes w/ Gravy & Jerky", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Boil 2 cups water. Stir in mashed potato flakes, then gravy packet. Chop jerky and stir in. Savory and filling.",
+        ingredients: ["Instant mashed potatoes", "Gravy packets", "Beef jerky"] },
+      { name: "Dehydrated Chili Mac", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Boil water per pouch. Pour into pouch, stir, reseal 10 minutes. Stir again and serve.",
+        ingredients: ["Dehydrated chili mac pouches"] },
+      { name: "Couscous w/ Chicken Packet & Olive Oil", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Boil 1.5 cups water. Remove from heat, stir in couscous + chicken packet + olive oil + spices. Cover 5 min. Fluff.",
+        ingredients: ["Couscous", "Chicken packets", "Olive oil packets", "Spices"] },
+      { name: "Backcountry Rice & Beans w/ Salsa", violates: [],
+        howto: "Boil 2 cups water. Add instant rice and dehydrated beans, simmer 5 min. Stir in salsa packets. Vegan-friendly backcountry comfort.",
+        ingredients: ["Instant rice", "Dehydrated beans", "Salsa packets"] },
+      { name: "Pasta Primavera (freeze-dried)", violates: ["vegan","gluten-free","dairy-free"],
+        howto: "Boil 2 cups water, pour into pouch, stir, reseal 10 min. Enjoy this lighter vegetarian backcountry option.",
+        ingredients: ["Freeze-dried pasta primavera pouches"] },
+      { name: "Instant Rice w/ Indian Pouch (Tasty Bite)", violates: [],
+        howto: "Prepare instant rice per package. Submerge sealed Tasty Bite pouch in boiling water 5 min to heat. Pour over rice.",
+        ingredients: ["Instant rice", "Tasty Bite Indian pouches"] },
+      { name: "Lentil Stew (dehydrated)", violates: [],
+        howto: "Boil 2 cups water, add dehydrated lentils and spices, simmer 15 min until tender. Vegan protein-rich dinner.",
+        ingredients: ["Dehydrated lentil stew", "Spices"] },
+      { name: "Freeze-Dried Lasagna", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Boil 2.5 cups water. Pour into pouch, stir well, reseal 12 minutes (longer for full hydration). Stir and serve.",
+        ingredients: ["Freeze-dried lasagna pouches"] },
+      { name: "Thai Peanut Noodles (dehydrated)", violates: ["nut-allergy","gluten-free"],
+        howto: "Boil 2 cups water. Add rice noodles and dried veggies, cook 4 min. Stir in peanut sauce packet. Serve hot.",
+        ingredients: ["Rice noodles", "Peanut sauce packets", "Dried veggies"] },
+      { name: "Cajun Jambalaya (Zatarain's + Chicken Packet)", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Boil 2.5 cups water, stir in Zatarain's mix, simmer 25 min. Stir in chicken packet in last 5 min. Let rest covered before serving.",
+        ingredients: ["Zatarain's jambalaya mix", "Chicken packets"] },
+      { name: "Mac & Cheese w/ Tuna", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Cook mac per box. Drain (or save water for soup). Stir in cheese powder + powdered milk + tuna packet. A Scout comfort classic.",
+        ingredients: ["Mac & cheese box", "Tuna packets", "Powdered milk"] },
+      { name: "Backcountry Pad Thai", violates: ["nut-allergy","gluten-free"],
+        howto: "Cook rice noodles in boiling water 4 min. Drain. Stir in pad Thai sauce packet and peanuts. Fast Asian-style backcountry meal.",
+        ingredients: ["Pad Thai mix", "Peanuts"] },
+      { name: "Beef Stew (freeze-dried)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Boil 2 cups water, pour into pouch, stir, reseal 10 min. Hearty cold-weather dinner.",
+        ingredients: ["Freeze-dried beef stew pouches"] },
+      { name: "Teriyaki Chicken & Rice", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Cook instant rice. Heat chicken packet in simmering water. Serve chicken over rice, drizzle soy sauce.",
+        ingredients: ["Instant rice", "Teriyaki chicken packets", "Soy sauce"] },
+      { name: "Chicken Fajita Wraps (dehydrated)", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Rehydrate fajita mix with boiling water, wait 10 min. Spoon into tortillas, roll up, serve hot.",
+        ingredients: ["Dehydrated fajita mix", "Tortillas"] },
+      { name: "Shepherd's Pie (freeze-dried)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Boil water per pouch, pour in, stir, reseal 10-12 min. A comforting freeze-dried classic.",
+        ingredients: ["Freeze-dried shepherd's pie pouches"] },
+      { name: "Stroganoff w/ Beef Jerky & Egg Noodles", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Cook egg noodles in 3 cups water, drain. Mix in gravy packet + powdered milk + crumbled jerky. Stir to creamy.",
+        ingredients: ["Egg noodles", "Beef jerky", "Gravy mix", "Powdered milk"] },
+      { name: "Alpine Spaghetti w/ Pepperoni", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Boil spaghetti 8 min, drain. Stir in tomato powder + water + pepperoni. Top with parmesan. Twirl and enjoy.",
+        ingredients: ["Spaghetti", "Tomato powder", "Pepperoni", "Parmesan"] }
+    ]
+  },
+  carcamping: {
+    Breakfast: [
+      { name: "Dutch Oven Breakfast Casserole", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Layer hash browns in a 12\" Dutch oven. Add browned sausage, sautéed peppers & onions. Pour beaten eggs over top, sprinkle cheese. Bake with 8 coals on bottom, 16 on lid, ~30 min until eggs set.",
+        ingredients: ["Eggs", "Hash browns (frozen)", "Sausage", "Cheddar cheese", "Onions", "Bell peppers"] },
+      { name: "Bacon & Eggs w/ Hash Browns", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Fry bacon on griddle until crisp; set aside on paper towel. Cook hash browns in bacon grease until golden. Scramble eggs in remaining fat. Season generously.",
+        ingredients: ["Bacon", "Eggs", "Hash browns", "Salt & pepper", "Butter"] },
+      { name: "Campfire French Toast", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Whisk eggs, milk, cinnamon, vanilla in a bowl. Dip bread slices. Cook on buttered griddle 2-3 min per side until golden. Serve with syrup.",
+        ingredients: ["Bread", "Eggs", "Milk", "Cinnamon", "Vanilla", "Syrup", "Butter"] },
+      { name: "Pancakes w/ Maple Syrup & Sausage", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Mix pancake batter per box. Cook sausage links on griddle, set aside. Pour 1/4-cup pancakes on buttered griddle; flip when bubbles form. Stack & drizzle syrup.",
+        ingredients: ["Pancake mix", "Eggs", "Milk", "Maple syrup", "Breakfast sausage", "Butter"] },
+      { name: "Breakfast Burritos w/ Salsa", violates: ["vegan","gluten-free","dairy-free"],
+        howto: "Brown sausage or bacon on griddle; remove. Scramble eggs with onions in same pan. Fill tortillas with eggs, meat, cheese, salsa. Roll and serve.",
+        ingredients: ["Flour tortillas", "Eggs", "Sausage/bacon", "Cheese", "Salsa", "Onions"] },
+      { name: "Biscuits & Sausage Gravy", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Bake biscuits in Dutch oven (10 coals bottom, 14 top, 15 min). Brown sausage in skillet. Sprinkle flour, whisk in milk, simmer until thick. Season heavily with pepper. Pour over split biscuits.",
+        ingredients: ["Biscuit mix", "Breakfast sausage", "Flour", "Milk", "Pepper"] },
+      { name: "Scrambled Eggs w/ Peppers & Cheese", violates: ["vegan","dairy-free"],
+        howto: "Sauté diced peppers and onions in butter 3 min. Pour in beaten eggs, stir gently until just set. Top with cheese, cover 1 min to melt.",
+        ingredients: ["Eggs", "Bell peppers", "Onions", "Cheese", "Butter"] },
+      { name: "Oatmeal Bar w/ Fresh Fruit & Nuts", violates: ["gluten-free","nut-allergy"],
+        howto: "Cook oats in boiling water 5 min, stirring. Set out toppings: berries, sliced bananas, walnuts, brown sugar, milk. Let Scouts build their own bowls.",
+        ingredients: ["Oats", "Brown sugar", "Fresh berries", "Bananas", "Walnuts", "Milk"] },
+      { name: "Grilled Breakfast Sandwiches", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Toast English muffin halves on griddle. Fry eggs to desired doneness. Warm Canadian bacon. Stack muffin + egg + bacon + cheese. Close and press briefly until cheese melts.",
+        ingredients: ["English muffins", "Eggs", "Canadian bacon", "Cheese slices"] },
+      { name: "Omelet in a Bag (Zip-Top method)", violates: ["vegan","dairy-free"],
+        howto: "Each Scout cracks 2 eggs into a quart freezer bag with their toppings. Seal (squeeze air out), label with name. Boil in pot of water 12-14 min. Slide out — perfect omelets.",
+        ingredients: ["Eggs", "Cheese", "Ham/bacon", "Peppers", "Zip-top freezer bags"] },
+      { name: "Dutch Oven Cinnamon Rolls", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Grease 12\" Dutch oven, arrange canned cinnamon rolls inside. Bake with 8 coals bottom, 16 on lid, ~20 min until golden. Drizzle icing and serve hot.",
+        ingredients: ["Refrigerated cinnamon rolls", "Butter", "Brown sugar"] },
+      { name: "Dutch Oven Monkey Bread", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Cut biscuit dough into quarters. Roll in cinnamon-sugar, layer in greased Dutch oven. Drizzle melted butter + brown sugar. Bake 8/16 coals ~25 min. Pull apart to serve.",
+        ingredients: ["Refrigerated biscuit dough", "Butter", "Brown sugar", "Cinnamon"] },
+      { name: "Cowboy Coffee & Donuts", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Boil 6 cups water in pot. Toss in 1/2 cup ground coffee, remove from heat, steep 4 min. Sprinkle cold water on top to settle grounds. Pour carefully. Serve with donuts.",
+        ingredients: ["Ground coffee", "Donuts (pre-made)"] },
+      { name: "Sausage & Egg Skillet", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Brown sausage with diced potatoes and onions in cast iron. Once potatoes are tender, crack eggs on top, cover, cook 4 min until eggs set. Top with cheese.",
+        ingredients: ["Breakfast sausage", "Eggs", "Potatoes", "Onions", "Cheese"] },
+      { name: "Campfire Breakfast Pizza", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Press pizza dough into greased Dutch oven. Par-bake 10 min. Top with scrambled eggs, crumbled sausage, peppers, cheese. Bake 8/16 coals ~15 more min.",
+        ingredients: ["Pizza dough", "Eggs", "Sausage", "Cheese", "Bell peppers"] },
+      { name: "Huevos Rancheros", violates: ["vegan","dairy-free"],
+        howto: "Warm corn tortillas on griddle. Heat black beans in a pan. Fry eggs sunny-side up. Layer: tortilla, beans, egg, salsa, cheese. Bold and filling.",
+        ingredients: ["Eggs", "Corn tortillas", "Black beans", "Salsa", "Cheese"] },
+      { name: "Banana Pancakes on the Griddle", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Mash 1 banana per 2 pancakes into batter. Cook on buttered griddle until bubbles form, flip once. Serve with syrup. Bananas caramelize beautifully.",
+        ingredients: ["Pancake mix", "Bananas", "Eggs", "Milk", "Syrup"] },
+      { name: "Breakfast Quesadillas", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Cook bacon, set aside. Scramble eggs. Butter one side of tortilla, flip butter-down on griddle. Top half with eggs, bacon, cheese. Fold, cook 2 min per side.",
+        ingredients: ["Flour tortillas", "Eggs", "Cheese", "Bacon", "Salsa"] },
+      { name: "Egg in a Hole (toast & egg)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Cut a hole in center of bread slice with cup rim. Butter bread, place on griddle. Crack egg into hole. Cook 2 min, flip, cook 2 min more. Classic.",
+        ingredients: ["Bread", "Eggs", "Butter", "Salt & pepper"] },
+      { name: "Hash Brown Breakfast Bowl w/ Bacon", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Fry hash browns in bacon fat until crispy. Top with crumbled bacon, scrambled eggs, shredded cheese, and green onions. Serve in bowls or on plates.",
+        ingredients: ["Hash browns", "Bacon", "Eggs", "Cheese", "Green onions"] }
+    ],
+    Lunch: [
+      { name: "Hobo Foil Pack Lunch (burger + veg)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "On a 12\" foil square: layer 1/3 lb ground beef patty, sliced potatoes, carrots, onions, butter, salt/pepper. Wrap tightly in 2 layers foil. Place in coals 15 min per side. Open carefully — steam!",
+        ingredients: ["Ground beef", "Potatoes", "Carrots", "Onions", "Butter", "Heavy-duty foil", "Seasoning"] },
+      { name: "Grilled Cheese Sandwiches on the Griddle", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Butter outsides of bread slices. Place on hot griddle, top with cheese, close sandwich. Flip when golden (~3 min). Cook second side until cheese melts.",
+        ingredients: ["Bread", "American cheese", "Butter"] },
+      { name: "Hot Dogs Roasted on the Fire", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Skewer hot dogs on sticks or metal skewers. Roast over glowing coals (not flames) 5-7 min, rotating for even char. Serve in buns with condiments.",
+        ingredients: ["Hot dogs", "Hot dog buns", "Ketchup", "Mustard", "Relish"] },
+      { name: "Walking Tacos (Fritos + chili)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Heat chili in a pot. Crush a Fritos individual bag, open top, pour in 1/4 cup chili, add cheese/sour cream/lettuce. Eat with a fork right out of the bag.",
+        ingredients: ["Fritos individual bags", "Canned chili", "Shredded cheese", "Sour cream", "Lettuce"] },
+      { name: "Chicken & Cheese Quesadillas", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Heat pre-cooked chicken. Place tortilla on griddle, sprinkle cheese and chicken on half, fold. Cook 2 min per side until golden. Cut in wedges, serve with salsa.",
+        ingredients: ["Flour tortillas", "Cooked chicken", "Cheese", "Salsa"] },
+      { name: "BLT Sandwiches", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Cook bacon crispy. Toast bread on griddle. Spread mayo on toast, layer bacon, lettuce, tomato slices. Close and slice diagonally.",
+        ingredients: ["Bacon", "Lettuce", "Tomatoes", "Bread", "Mayo"] },
+      { name: "Grilled Chicken Wraps", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Season chicken breasts with salt/pepper. Grill 6 min per side. Slice. Fill tortillas with chicken, lettuce, cheese, ranch. Roll tight.",
+        ingredients: ["Flour tortillas", "Chicken breasts", "Lettuce", "Ranch dressing", "Cheese"] },
+      { name: "Build-Your-Own Burger Bar", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Form 1/3-lb patties. Grill 4 min per side (medium). Toast buns cut-side on grill. Set out toppings bar. Let each Scout build their own.",
+        ingredients: ["Ground beef", "Hamburger buns", "Lettuce", "Tomatoes", "Onions", "Cheese", "Pickles", "Condiments"] },
+      { name: "Campfire Nachos (Dutch oven)", violates: ["vegan","gluten-free","dairy-free"],
+        howto: "Layer chips in 12\" Dutch oven, cover with refried beans, cheese, jalapeños. Bake 8/8 coals 10 min until cheese melts. Top with salsa. Dig in.",
+        ingredients: ["Tortilla chips", "Shredded cheese", "Canned refried beans", "Jalapeños", "Salsa"] },
+      { name: "Tuna Salad Sandwiches", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Drain canned tuna. Mix with mayo, diced celery, chopped onion, salt/pepper. Spread on bread, close sandwich, cut.",
+        ingredients: ["Canned tuna", "Mayo", "Celery", "Bread", "Onion"] },
+      { name: "Pita Pizzas on the Grill", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Spread pizza sauce on pita. Top with mozzarella, pepperoni, mushrooms. Place on grill over medium coals, close lid 5-7 min until cheese melts.",
+        ingredients: ["Pita bread", "Pizza sauce", "Mozzarella", "Pepperoni", "Mushrooms"] },
+      { name: "Chili Dogs w/ Shredded Cheese", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Grill hot dogs. Heat chili in pot. Place dog in bun, ladle chili, top with cheese and diced onions. Serve immediately.",
+        ingredients: ["Hot dogs", "Buns", "Canned chili", "Shredded cheese", "Onions"] },
+      { name: "Chicken Caesar Wraps", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Toss romaine with Caesar dressing and parmesan. Layer onto tortillas with sliced cooked chicken. Roll tightly and slice diagonally.",
+        ingredients: ["Tortillas", "Romaine lettuce", "Caesar dressing", "Parmesan", "Cooked chicken"] },
+      { name: "Pulled Pork Sandwiches (pre-cooked)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Warm pre-cooked pulled pork in a pot with BBQ sauce (10 min over coals). Pile on buns, top with coleslaw for crunch.",
+        ingredients: ["Pre-cooked pulled pork", "Buns", "BBQ sauce", "Coleslaw"] },
+      { name: "Subs & Chips (deli spread)", violates: ["vegan","gluten-free"],
+        howto: "Slice sub rolls lengthwise. Layer deli meats, cheese, lettuce, tomatoes. Add oil & vinegar or mayo. Close, wrap in foil, slice.",
+        ingredients: ["Sub rolls", "Assorted deli meats", "Provolone", "Lettuce", "Tomatoes", "Potato chips"] },
+      { name: "Pasta Salad w/ Italian Dressing", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Cook rotini, drain, rinse cold. Toss with Italian dressing, halved cherry tomatoes, olives, cubed mozzarella. Chill 30 min in cooler before serving.",
+        ingredients: ["Rotini pasta", "Italian dressing", "Cherry tomatoes", "Olives", "Cubed cheese"] },
+      { name: "Grilled Chicken Salad", violates: ["vegetarian","vegan","pescatarian"],
+        howto: "Grill chicken breasts 6 min per side. Slice. Toss mixed greens with tomatoes, cucumbers. Top with chicken, drizzle dressing.",
+        ingredients: ["Chicken breasts", "Mixed greens", "Cherry tomatoes", "Cucumbers", "Dressing"] },
+      { name: "Sausage & Pepper Sandwiches", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Slice peppers and onions, sauté in oil 8 min until soft. Grill Italian sausages 10 min, turning. Place sausage in hoagie, top with peppers.",
+        ingredients: ["Italian sausage", "Bell peppers", "Onions", "Hoagie rolls"] },
+      { name: "Philly Cheesesteak Foil Packs", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "On a foil square: shaved steak, peppers, onions, provolone. Wrap tightly. Cook over coals 10 min per side. Open carefully and stuff into hoagie rolls.",
+        ingredients: ["Shaved steak", "Provolone", "Bell peppers", "Onions", "Hoagie rolls", "Foil"] },
+      { name: "Bratwurst w/ Sauerkraut & Mustard", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Simmer brats in beer or water 10 min, then grill 5 min to crisp. Warm sauerkraut in saucepan. Serve brat in bun, topped with kraut and mustard.",
+        ingredients: ["Bratwurst", "Brat buns", "Sauerkraut", "Stone-ground mustard"] }
+    ],
+    Dinner: [
+      { name: "Dutch Oven Chili w/ Cornbread", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Brown ground beef with onions in Dutch oven. Add beans, tomato sauce, chili powder, cumin. Simmer 45 min. Drop cornbread batter on top, bake with 8/16 coals 20 min until cornbread is golden.",
+        ingredients: ["Ground beef", "Kidney beans", "Black beans", "Tomato sauce", "Onions", "Chili powder", "Cornbread mix"] },
+      { name: "Hobo Foil Pack Dinners", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Each Scout layers on a foil square: 1/3-lb burger or chicken, sliced potatoes, carrots, onions, butter pat, seasoning. Double-wrap. Cook in coals 15 min each side. Open away from face.",
+        ingredients: ["Ground beef or chicken", "Potatoes", "Carrots", "Onions", "Seasoning", "Heavy-duty foil", "Butter"] },
+      { name: "Campfire Pizza (Dutch oven)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Press pizza dough into greased 12\" Dutch oven. Top with sauce, mozzarella, pepperoni, veggies. Bake 8/16 coals 20-25 min until crust golden and cheese bubbly.",
+        ingredients: ["Pizza dough", "Pizza sauce", "Mozzarella", "Pepperoni", "Mushrooms", "Bell peppers"] },
+      { name: "Dutch Oven Lasagna", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Brown beef. Layer in Dutch oven: sauce, uncooked noodles (broken), beef, ricotta, mozzarella. Repeat. End with mozzarella. Bake 8/16 coals 45 min.",
+        ingredients: ["Lasagna noodles", "Ground beef", "Ricotta", "Mozzarella", "Marinara", "Italian seasoning"] },
+      { name: "Cowboy Beef Stew", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Brown stew beef in Dutch oven. Add diced potatoes, carrots, onions. Pour in beef broth + tomato paste. Simmer covered over coals 90 min until beef is fork-tender.",
+        ingredients: ["Stew beef", "Potatoes", "Carrots", "Onions", "Beef broth", "Tomato paste"] },
+      { name: "Grilled Steaks w/ Foil Potatoes", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Wrap sliced potatoes with butter, garlic, rosemary in foil; cook in coals 30 min. Salt steaks, grill over hot coals 4-5 min per side. Rest 5 min before slicing.",
+        ingredients: ["Ribeye steaks", "Potatoes", "Butter", "Garlic", "Rosemary", "Foil"] },
+      { name: "Chicken & Rice (Dutch oven)", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Sear chicken thighs skin-down in Dutch oven until golden. Remove. Sauté onions and peppers in drippings. Add rice, broth, seasoning. Nestle chicken on top. Bake 8/16 coals 35 min.",
+        ingredients: ["Chicken thighs", "Rice", "Chicken broth", "Onions", "Peppers", "Seasoning"] },
+      { name: "Spaghetti & Meatballs", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Simmer frozen meatballs in marinara sauce 25 min. Cook spaghetti in salted water 8 min, drain. Top with sauce and meatballs. Sprinkle parmesan. Serve with garlic bread.",
+        ingredients: ["Spaghetti", "Frozen meatballs", "Marinara", "Parmesan", "Garlic bread"] },
+      { name: "Dutch Oven Pot Roast & Cobbler", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "MAIN: Sear chuck roast, add veggies and broth, Dutch-oven 8/16 coals for 3 hours. DESSERT: Pour peach pie filling into second Dutch oven, top with cake mix and butter pats. Bake 8/16 coals 45 min.",
+        ingredients: ["Chuck roast", "Potatoes", "Carrots", "Onions", "Peach pie filling", "Cake mix", "Butter"] },
+      { name: "Campfire Soft Tacos", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Brown ground beef, drain, stir in taco seasoning + 1/2 cup water, simmer 5 min. Warm tortillas on griddle. Set out toppings. Let Scouts build their own.",
+        ingredients: ["Ground beef", "Taco seasoning", "Flour tortillas", "Cheese", "Lettuce", "Salsa", "Sour cream"] },
+      { name: "Shish Kabobs on Skewers", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Cube beef or chicken. Marinate 30 min if possible. Thread onto soaked skewers alternating with peppers, onions, mushrooms, pineapple. Grill over hot coals 12 min, rotating.",
+        ingredients: ["Beef/chicken cubes", "Bell peppers", "Onions", "Mushrooms", "Pineapple", "Skewers"] },
+      { name: "Chili Mac (one-pot)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Brown beef with onions in pot. Add canned chili, 2 cups water, and uncooked elbow macaroni. Simmer covered 12 min until pasta is tender. Top with cheese to melt.",
+        ingredients: ["Elbow macaroni", "Ground beef", "Canned chili", "Shredded cheese", "Onions"] },
+      { name: "Cajun Jambalaya (Dutch oven)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Brown andouille and chicken in Dutch oven. Sauté peppers, onions, tomatoes. Add rice, stock, Cajun seasoning. Cover, bake 8/16 coals 30 min. Rest 5 min.",
+        ingredients: ["Andouille sausage", "Chicken", "Rice", "Bell peppers", "Tomatoes", "Cajun seasoning"] },
+      { name: "BBQ Ribs (foil-wrapped)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Rub ribs generously with dry rub. Wrap tightly in 2 layers heavy foil. Cook over medium coals 2.5 hours, rotating every 30 min. Open, slather BBQ sauce, grill 5 min each side.",
+        ingredients: ["Pork ribs", "BBQ sauce", "Dry rub", "Foil"] },
+      { name: "Pulled Pork w/ Coleslaw", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Rub pork shoulder with spices. Wrap in foil with a splash of broth. Cook in Dutch oven over coals 5-6 hours until fork-shreddable. Mix coleslaw. Pile pork + slaw on buns.",
+        ingredients: ["Pork shoulder", "BBQ sauce", "Coleslaw mix", "Buns"] },
+      { name: "Fresh-Caught Fish Fry", violates: ["vegetarian","vegan","gluten-free","dairy-free"],
+        howto: "Dredge fillets in seasoned flour/cornmeal mix. Fry in 1/2\" hot oil 3-4 min per side until golden. Drain on paper. Squeeze lemon, serve immediately.",
+        ingredients: ["Fish fillets", "Cornmeal", "Flour", "Oil", "Lemons"] },
+      { name: "Gumbo w/ Sausage", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Make roux: flour + oil stirred over medium heat until chocolate-brown (30 min — patience!). Add trinity (pepper/onion/celery), sausage, chicken, okra, stock. Simmer 1 hour. Serve over rice.",
+        ingredients: ["Andouille sausage", "Chicken", "Okra", "Rice", "Stock", "Roux ingredients"] },
+      { name: "Chicken Fajitas on the Griddle", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Marinate chicken strips in fajita seasoning. Sizzle on hot griddle with peppers and onions 8 min. Warm tortillas. Let Scouts build with sour cream and cheese.",
+        ingredients: ["Chicken strips", "Bell peppers", "Onions", "Tortillas", "Fajita seasoning", "Sour cream", "Cheese"] },
+      { name: "Mountain Man Breakfast-for-Dinner", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "In Dutch oven: layer hash browns, browned sausage, sautéed peppers/onions. Crack eggs over top. Sprinkle cheese. Bake 8/16 coals 30 min until eggs set.",
+        ingredients: ["Sausage", "Eggs", "Hash browns", "Cheese", "Bell peppers", "Onions"] },
+      { name: "Dutch Oven Chicken Enchiladas", violates: ["vegetarian","vegan","pescatarian","dairy-free","gluten-free"],
+        howto: "Mix cooked chicken with half the sauce, beans, onions. Fill tortillas, roll, pack in greased Dutch oven. Cover with remaining sauce and cheese. Bake 8/16 coals 25 min.",
+        ingredients: ["Flour tortillas", "Cooked chicken", "Enchilada sauce", "Cheese", "Black beans", "Onions"] }
+    ]
+  },
+  daycamping: {
+    Breakfast: [
+      { name: "Granola & Protein Bars", violates: ["gluten-free","nut-allergy"],
+        howto: "Hand out granola bars and protein bars from the cooler. No prep — fast fuel for morning activities.",
+        ingredients: ["Granola bars", "Protein bars"] },
+      { name: "Bagels w/ Cream Cheese & Jam", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Slice bagels (toast on griddle if desired). Spread cream cheese and jam. Serve on paper plates.",
+        ingredients: ["Bagels", "Cream cheese", "Strawberry jam"] },
+      { name: "Fresh Fruit & Yogurt Cups", violates: ["vegan","dairy-free"],
+        howto: "Arrange fresh fruit on a platter. Hand out individual yogurt cups with spoons. Let Scouts top yogurt with fruit.",
+        ingredients: ["Apples", "Bananas", "Oranges", "Yogurt cups"] },
+      { name: "Pre-Made Breakfast Sandwiches", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Microwave or heat frozen breakfast sandwiches on the grill wrapped in foil (10 min flipping once). Serve hot.",
+        ingredients: ["Frozen breakfast sandwiches"] },
+      { name: "Assorted Muffins (banana, blueberry)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Set out a variety of bakery muffins. Serve with coffee or juice. Absolutely no cooking required.",
+        ingredients: ["Muffins (bakery)"] },
+      { name: "Pop-Tarts & Juice Boxes", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Toast Pop-Tarts if desired (or eat cold). Distribute juice boxes. Peak Scout-energy breakfast.",
+        ingredients: ["Pop-Tarts", "Juice boxes"] },
+      { name: "Trail Mix Breakfast Bags", violates: ["nut-allergy"],
+        howto: "Pre-portion trail mix into zip bags for each Scout. Grab and go.",
+        ingredients: ["Trail mix", "Zip bags"] },
+      { name: "Single-Serve Cereal Cups w/ Milk", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Hand out cereal cups. Pour individual milk boxes into each. Eat with plastic spoons.",
+        ingredients: ["Cereal cups", "Milk boxes"] },
+      { name: "Hard-Boiled Eggs & Fruit", violates: ["vegan","dairy-free"],
+        howto: "Boil eggs at home (10 min) and chill overnight. Bring in cooler. Peel, sprinkle salt, eat with fresh fruit.",
+        ingredients: ["Hard-boiled eggs", "Fresh fruit", "Salt"] },
+      { name: "Pre-Made Breakfast Burritos", violates: ["vegan","gluten-free","dairy-free"],
+        howto: "Wrap frozen burritos in foil. Heat on grill over medium coals 15 min, turning. Serve with salsa.",
+        ingredients: ["Frozen breakfast burritos", "Salsa"] },
+      { name: "Assorted Donuts & Coffee", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Set out donut box. Brew coffee in percolator or pour from thermos. Enjoy a classic.",
+        ingredients: ["Donuts", "Coffee"] },
+      { name: "Pancake-on-a-Stick (sausage)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Heat frozen pancake-wrapped sausage sticks per package (microwave or wrap in foil on grill). Serve with syrup for dipping.",
+        ingredients: ["Frozen pancake-sausage sticks", "Syrup"] },
+      { name: "Cinnamon Rolls (pre-baked)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Serve pre-baked cinnamon rolls. Reheat on griddle 2 min per side if desired. Glaze will melt beautifully.",
+        ingredients: ["Cinnamon rolls"] },
+      { name: "Breakfast Bars (Belvita, Nature Valley)", violates: ["gluten-free","nut-allergy"],
+        howto: "Open, eat. Portable breakfast for Scouts on the move.",
+        ingredients: ["Breakfast bars"] },
+      { name: "Yogurt Parfaits w/ Granola", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "In clear cups, layer yogurt, granola, berries. Repeat. Serve immediately with spoons.",
+        ingredients: ["Yogurt", "Granola", "Berries"] },
+      { name: "Instant Oatmeal (thermos hot water)", violates: ["gluten-free"],
+        howto: "Fill thermos with boiling water at home. At camp, empty oatmeal packet into cup, pour hot water, stir.",
+        ingredients: ["Instant oatmeal packets", "Thermos"] },
+      { name: "Fruit Smoothies (pre-made)", violates: ["vegan","dairy-free"],
+        howto: "Keep bottled smoothies cold in cooler. Distribute. Shake before drinking.",
+        ingredients: ["Bottled smoothies"] },
+      { name: "Toaster Waffles w/ Peanut Butter", violates: ["nut-allergy","gluten-free"],
+        howto: "Toast frozen waffles on griddle until crispy. Spread peanut butter (melts deliciously). Drizzle syrup.",
+        ingredients: ["Frozen waffles", "Peanut butter", "Syrup"] },
+      { name: "Cold Breakfast Quesadillas", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Spread cream cheese on tortilla, top with sliced strawberries, fold in half. Cut in wedges. Eat cold.",
+        ingredients: ["Tortillas", "Cream cheese", "Strawberries"] },
+      { name: "Cheese & Cracker Snack Packs", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Distribute individual cheese & cracker packs. Peel back lid, use the included red stick to stack.",
+        ingredients: ["Cheese & cracker packs"] }
+    ],
+    Lunch: [
+      { name: "Classic PB&J Sack Lunch", violates: ["gluten-free","nut-allergy"],
+        howto: "Make sandwiches at home morning-of. Pack each in a bag with a handful of chips and a fresh apple. Hand out at lunch.",
+        ingredients: ["Bread", "Peanut butter", "Jelly", "Chips", "Apples"] },
+      { name: "Turkey & Cheese Sandwiches", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Layer turkey, cheese, lettuce on bread with mayo. Cut diagonally. Wrap in wax paper for transport.",
+        ingredients: ["Turkey deli slices", "Cheese", "Bread", "Lettuce", "Mayo"] },
+      { name: "Chicken Wraps & Chips", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Fill tortilla with chicken, lettuce, ranch. Roll tightly, wrap in foil. Serve with side of chips.",
+        ingredients: ["Chicken", "Tortillas", "Lettuce", "Ranch", "Chips"] },
+      { name: "Cold Pasta Salad", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Cook rotini at home, drain, rinse cold. Toss with Italian dressing, tomatoes, olives. Chill until lunch.",
+        ingredients: ["Rotini", "Italian dressing", "Cherry tomatoes", "Olives"] },
+      { name: "Build-Your-Own Sub Sandwiches", violates: ["vegan","gluten-free"],
+        howto: "Set out sliced sub rolls and all fixings. Each Scout builds their own: meats, cheese, veggies, condiments.",
+        ingredients: ["Sub rolls", "Deli meats", "Cheese", "Lettuce", "Tomatoes", "Condiments"] },
+      { name: "Grilled Hot Dogs w/ Buns", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Grill hot dogs over medium heat 5-7 min, rolling for even char. Serve in buns with condiments bar.",
+        ingredients: ["Hot dogs", "Buns", "Condiments"] },
+      { name: "Hamburgers on the Grill", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Form 1/3-lb patties, season with salt/pepper. Grill 4 min per side. Toast buns. Set out cheese and toppings.",
+        ingredients: ["Ground beef", "Buns", "Cheese", "Lettuce", "Tomatoes", "Condiments"] },
+      { name: "Chicken Quesadillas", violates: ["vegetarian","vegan","pescatarian","dairy-free","gluten-free"],
+        howto: "Layer chicken and cheese on tortilla, fold. Cook on griddle 2 min per side. Cut in wedges, serve with salsa.",
+        ingredients: ["Tortillas", "Cooked chicken", "Cheese", "Salsa"] },
+      { name: "Walking Tacos (Fritos bag)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Open individual Fritos bag. Add warmed chili, shredded cheese, sour cream. Eat with a fork right from the bag.",
+        ingredients: ["Fritos bags", "Canned chili", "Cheese", "Sour cream"] },
+      { name: "Easy Mac Cups (just add water)", violates: ["vegan","gluten-free","dairy-free"],
+        howto: "Add water to fill line in Easy Mac cup. Microwave 3.5 min (or pour in boiling water, wait 8 min). Stir in cheese packet.",
+        ingredients: ["Easy Mac cups"] },
+      { name: "Hummus & Veggie Platter", violates: ["gluten-free"],
+        howto: "Arrange carrots, celery, bell pepper strips on a platter with hummus tubs. Serve with pita chips for scooping.",
+        ingredients: ["Hummus", "Carrots", "Celery", "Bell peppers", "Pita chips"] },
+      { name: "Cheese & Crackers Charcuterie", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Arrange sliced cheeses, crackers, salami, and grapes on a platter. Let Scouts build their own bites.",
+        ingredients: ["Cheese", "Crackers", "Salami", "Grapes"] },
+      { name: "Pita Pockets w/ Chicken Salad", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Stuff pita halves with chicken salad and lettuce. Hand out — portable and mess-free.",
+        ingredients: ["Pita bread", "Chicken salad", "Lettuce"] },
+      { name: "Chicken Salad Wraps", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Spread chicken salad on tortilla, add lettuce. Roll tight, cut in half.",
+        ingredients: ["Tortillas", "Chicken salad", "Lettuce"] },
+      { name: "Tuna Salad Sandwiches (Day)", violates: ["vegetarian","vegan","gluten-free"],
+        howto: "Mix drained tuna with mayo and diced celery. Spread on bread, close, cut. Pack with an ice pack.",
+        ingredients: ["Canned tuna", "Mayo", "Bread", "Celery"] },
+      { name: "Ham & Cheese Sliders", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Split slider rolls. Layer ham and Swiss. Brush tops with mustard-butter. Wrap in foil, heat on grill 10 min until gooey.",
+        ingredients: ["Slider rolls", "Ham", "Swiss cheese", "Butter", "Mustard"] },
+      { name: "Chef Salad w/ Dressing Packets", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free"],
+        howto: "Chop lettuce into bowls. Top with ham, turkey, cheese, hard-boiled egg wedges. Distribute dressing packets.",
+        ingredients: ["Lettuce", "Ham", "Turkey", "Cheese", "Eggs", "Dressing packets"] },
+      { name: "Fruit & Cheese Platter", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Arrange grapes, sliced apples, cheese cubes, crackers on a platter. Light, fresh, no cooking.",
+        ingredients: ["Grapes", "Apples", "Cheese cubes", "Crackers"] },
+      { name: "Grilled Cheese on Griddle", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Butter outsides of bread. Place on griddle, add cheese, close sandwich. Flip when golden.",
+        ingredients: ["Bread", "Cheese", "Butter"] },
+      { name: "Bagel Sandwiches w/ Deli Meat", violates: ["vegetarian","vegan","pescatarian","dairy-free","gluten-free"],
+        howto: "Slice bagels. Spread cream cheese. Layer turkey, lettuce. Close and serve.",
+        ingredients: ["Bagels", "Cream cheese", "Turkey", "Lettuce"] }
+    ],
+    Dinner: [
+      { name: "Hot Dogs on the Grill", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free"],
+        howto: "Grill hot dogs over medium coals 5-7 min, rotating. Serve in buns with condiments bar. Classic.",
+        ingredients: ["Hot dogs", "Buns", "Condiments"] },
+      { name: "Cheeseburgers & Chips", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Grill patties 4 min per side. Top with cheese last minute to melt. Toast buns. Serve with chips.",
+        ingredients: ["Ground beef", "Buns", "Cheese", "Chips", "Condiments"] },
+      { name: "Foil Pack Dinners", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "On foil: meat patty, sliced potatoes, carrots, onions, butter. Double-wrap. Cook in coals 15 min per side.",
+        ingredients: ["Ground beef or chicken", "Potatoes", "Carrots", "Onions", "Butter", "Foil"] },
+      { name: "Pulled Pork Sandwiches", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Heat pre-cooked pulled pork in pot with BBQ sauce 10 min. Pile high on buns.",
+        ingredients: ["Pre-cooked pulled pork", "Buns", "BBQ sauce"] },
+      { name: "Grilled Chicken & Veggies", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Season chicken with salt/pepper. Grill 6 min per side. Toss zucchini and peppers in oil, grill 8 min.",
+        ingredients: ["Chicken breasts", "Zucchini", "Bell peppers", "Olive oil", "Seasoning"] },
+      { name: "Campfire Chili (pre-made, reheated)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Pour pre-made chili into Dutch oven or pot. Heat over coals 15 min stirring occasionally. Top with cheese and sour cream.",
+        ingredients: ["Pre-made chili", "Shredded cheese", "Sour cream"] },
+      { name: "Sloppy Joes", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Brown ground beef, drain. Stir in Sloppy Joe sauce, simmer 10 min. Spoon onto buns. Messy and glorious.",
+        ingredients: ["Ground beef", "Sloppy Joe sauce", "Buns"] },
+      { name: "Bratwurst & Sauerkraut", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Simmer brats 10 min, then grill 5 min. Warm sauerkraut. Serve brat in bun with kraut and mustard.",
+        ingredients: ["Bratwurst", "Buns", "Sauerkraut", "Mustard"] },
+      { name: "Pasta Bake (reheated)", violates: ["vegetarian","vegan","pescatarian","halal","dairy-free","gluten-free"],
+        howto: "Wrap pre-made pasta bake in foil. Heat on grill over medium coals 25 min until bubbly.",
+        ingredients: ["Pre-made pasta bake"] },
+      { name: "BBQ Chicken", violates: ["vegetarian","vegan","pescatarian","gluten-free","dairy-free"],
+        howto: "Grill chicken pieces skin-down 8 min. Flip, brush with BBQ sauce, grill 8 min. Brush and flip again until cooked through (internal 165°F).",
+        ingredients: ["Chicken pieces", "BBQ sauce"] },
+      { name: "Hobo Dinners (foil packs)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Foil + beef + potatoes + carrots + onions. Double-wrap. Cook in coals 15 min per side.",
+        ingredients: ["Ground beef", "Potatoes", "Carrots", "Onions", "Foil"] },
+      { name: "Grilled Sausages & Peppers", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Grill Italian sausages 10 min turning. Sauté peppers and onions on griddle 8 min. Serve in rolls.",
+        ingredients: ["Italian sausage", "Peppers", "Onions", "Rolls"] },
+      { name: "Build-Your-Own Tacos", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Brown beef, add taco seasoning + water, simmer 5 min. Warm tortillas. Set out a toppings bar.",
+        ingredients: ["Ground beef", "Taco seasoning", "Tortillas", "Toppings bar"] },
+      { name: "Nachos Supreme", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Spread chips on foil-lined tray. Top with heated chili, cheese, jalapeños. Bake on covered grill 8 min until melty.",
+        ingredients: ["Tortilla chips", "Cheese", "Chili", "Jalapeños"] },
+      { name: "Cold Cut Sub Dinner", violates: ["vegan","gluten-free"],
+        howto: "Split sub rolls, layer deli meats, cheese, veggies, condiments. A no-cook evening option.",
+        ingredients: ["Sub rolls", "Deli meats", "Cheese", "Veggies"] },
+      { name: "Picnic Fried Chicken", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Pick up fried chicken en route to camp. Serve with pre-made sides (coleslaw, potato salad, biscuits). Low effort, high reward.",
+        ingredients: ["Pre-cooked fried chicken", "Sides"] },
+      { name: "Grilled Salmon & Rice (pescatarian)", violates: ["vegetarian","vegan","dairy-free"],
+        howto: "Brush salmon with butter, lemon juice. Grill skin-down 6 min, flip 3 min more. Serve over cooked rice.",
+        ingredients: ["Salmon fillets", "Rice", "Lemon", "Butter"] },
+      { name: "Veggie Burgers & Salads", violates: ["gluten-free","dairy-free"],
+        howto: "Grill veggie patties 4 min per side. Toast buns. Serve with mixed greens salad on the side.",
+        ingredients: ["Veggie burger patties", "Buns", "Mixed greens"] },
+      { name: "Rotisserie Chicken & Sides", violates: ["vegetarian","vegan","pescatarian","gluten-free"],
+        howto: "Pick up a rotisserie chicken on the way. Carve at camp. Reheat pre-made sides on the grill.",
+        ingredients: ["Rotisserie chicken", "Pre-made sides"] },
+      { name: "Campfire Stew (pre-made)", violates: ["vegetarian","vegan","pescatarian","halal","gluten-free","dairy-free"],
+        howto: "Pour pre-made stew into Dutch oven. Heat over coals 20 min until steaming. Serve with crackers.",
+        ingredients: ["Pre-made stew", "Crackers"] }
+    ]
+  }
+};
+
+/* ============== DISPOSABLES ============== */
+const DISPOSABLES = {
+  backpacking: [
+    "Zip-top freezer bags (quart size) — for rehydrating meals",
+    "Zip-top sandwich bags — for trail snacks",
+    "Paper towels (small roll)",
+    "Trash compactor bags — for packing out waste (Leave No Trace)",
+    "Ziploc gallon bags — bear-bag liners",
+    "Wet wipes (biodegradable)",
+    "Toilet paper (single roll, packed out)",
+    "Aluminum foil (small roll) — backup"
+  ],
+  carcamping: [
+    "Heavy-duty aluminum foil (for foil packs & Dutch oven lids)",
+    "Paper plates (sturdy)",
+    "Plastic utensils or compostable cutlery",
+    "Paper bowls",
+    "Cups (hot & cold) — 16 oz",
+    "Napkins / paper towels",
+    "Trash bags (contractor/heavy-duty) — 2+ per day",
+    "Ziploc bags (gallon & quart)",
+    "Dish soap (biodegradable)",
+    "Scrub sponges & scouring pads",
+    "Matches / lighter",
+    "Charcoal briquettes (for Dutch ovens)",
+    "Fire starter (tinder)",
+    "Hand sanitizer",
+    "Ice (blocks & cubes for cooler)"
+  ],
+  daycamping: [
+    "Paper plates", "Napkins", "Plastic utensils", "Cups (hot & cold)",
+    "Ziploc bags (assorted)", "Trash bags", "Hand sanitizer", "Paper towels", "Ice packs (reusable)"
+  ]
+};
+
+const PATROL_BOX = [
+  "Dutch oven (12\" — the Patrol's workhorse)",
+  "Dutch oven lid lifter",
+  "Charcoal chimney starter",
+  "Cast iron griddle",
+  "Two-burner propane stove + full propane bottle",
+  "Large stockpot (8 qt)",
+  "Two frying pans (10\" & 12\")",
+  "Spatulas (metal & silicone)",
+  "Wooden spoons & ladle",
+  "Tongs (long-handled)",
+  "Chef's knife & paring knife (sheathed)",
+  "Cutting boards (2 — meat & veg)",
+  "Measuring cups & spoons",
+  "Can opener",
+  "Grater & vegetable peeler",
+  "Whisk",
+  "Mixing bowls (set of 3)",
+  "Colander",
+  "Pot holders / leather gloves",
+  "Coffee percolator (cowboy coffee)",
+  "3-bucket wash system (wash / rinse / sanitize)",
+  "Dish rack / drying net",
+  "Dish towels & dishrags",
+  "Salt, pepper, seasoning box",
+  "Cooking oil",
+  "Aluminum foil (heavy-duty backup)",
+  "Camp table / cook station",
+  "Lantern (for late cooking)",
+  "First aid kit (kitchen-specific: burns, cuts)",
+  "Fire extinguisher (Class K)",
+  "Trash bag holder",
+  "Handwash station (water jug w/ spigot + soap)"
+];
+
+/* ============== APP STATE ============== */
+let state = {
+  campoutType: null,
+  people: 8,
+  days: 2,
+  patrolName: "",
+  diets: [],
+  otherAllergies: "",
+  meals: {}
+};
+
+function selectCampout(el) {
+  document.querySelectorAll('.campout-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.campoutType = el.dataset.type;
+}
+
+function goToStep(n) {
+  if (n === 2) {
+    if (!state.campoutType) { alert("⚜ Please choose your type of campout first, Scout!"); return; }
+    state.people = parseInt(document.getElementById('peopleCount').value) || 1;
+    state.days = parseInt(document.getElementById('tripLength').value) || 1;
+    state.patrolName = document.getElementById('patrolName').value.trim();
+    state.diets = [];
+    document.querySelectorAll('.diet-check input:checked').forEach(i => state.diets.push(i.value));
+    state.otherAllergies = document.getElementById('otherAllergies').value.trim();
+    buildDayBlocks();
+  }
+  if (n === 3) { captureMeals(); buildMenuReview(); }
+  if (n === 4) { buildShoppingList(); }
+
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('dot' + i).classList.toggle('active', i <= n);
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function recipeViolatesDiets(recipe, diets) {
+  if (!diets || diets.length === 0) return false;
+  return diets.some(d => (recipe.violates || []).includes(d));
+}
+
+function findFirstValidRecipeIndex(recipeList, diets) {
+  for (let i = 0; i < recipeList.length; i++) {
+    if (!recipeViolatesDiets(recipeList[i], diets)) return i;
+  }
+  return 0; // fallback to first even if it violates
+}
+
+function buildDayBlocks() {
+  const container = document.getElementById('daysContainer');
+  const type = state.campoutType;
+  const recipes = RECIPES[type];
+
+  const typeLabel = type === 'backpacking' ? 'Back Packing' : type === 'carcamping' ? 'Car Camping' : 'Day Camping';
+  const patrolLabel = state.patrolName ? `${state.patrolName} ⚜ ` : '';
+  const dietTags = state.diets.length ? state.diets.map(d => `<span class="summary-tag">${d}</span>`).join(' ') : '<em>None specified</em>';
+  const allergyLabel = state.otherAllergies ? ` <span class="summary-tag" style="background:var(--scout-red)">⚠ ${state.otherAllergies}</span>` : '';
+  document.getElementById('tripSummary').innerHTML =
+    `<strong>${patrolLabel}${typeLabel} Trek:</strong> ${state.people} Scouts · ${state.days} day(s)<br>
+     <strong>Dietary:</strong> ${dietTags}${allergyLabel}`;
+
+  container.innerHTML = '';
+  const meals = ['Breakfast', 'Lunch', 'Dinner'];
+
+  for (let d = 1; d <= state.days; d++) {
+    const dayBlock = document.createElement('div');
+    dayBlock.className = 'day-block';
+    let html = `<div class="day-header">⚜ Day ${d} ⚜</div>`;
+    meals.forEach(meal => {
+      const defaultChecked = !(d === 1 && meal === 'Breakfast' && type !== 'daycamping') ? 'checked' : '';
+      const recipeList = recipes[meal];
+      const defaultIdx = findFirstValidRecipeIndex(recipeList, state.diets);
+      const options = recipeList.map((r, i) => {
+        const violates = recipeViolatesDiets(r, state.diets);
+        const disabled = violates ? 'disabled' : '';
+        const suffix = violates ? ' ⚠ (restricted)' : '';
+        const selected = (i === defaultIdx) ? 'selected' : '';
+        return `<option value="${i}" ${disabled} ${selected}>${r.name}${suffix}</option>`;
+      }).join('');
+      const slotId = `slot-${d}-${meal}`;
+      html += `
+        <div class="meal-slot" data-day="${d}" data-meal="${meal}" id="${slotId}">
+          <input type="checkbox" ${defaultChecked} onchange="toggleMeal(this)">
+          <span class="meal-label">${meal}</span>
+          <select onchange="hideHowto('${slotId}')">${options}</select>
+          <button class="view-recipe-btn" type="button" onclick="toggleHowto('${slotId}')">📖 View Recipe</button>
+          <div class="recipe-howto" id="howto-${slotId}"></div>
+        </div>`;
+    });
+    dayBlock.innerHTML = html;
+    container.appendChild(dayBlock);
+  }
+  document.querySelectorAll('.meal-slot input[type="checkbox"]').forEach(cb => toggleMeal(cb));
+}
+
+function toggleMeal(cb) {
+  const slot = cb.closest('.meal-slot');
+  slot.classList.toggle('unchecked', !cb.checked);
+}
+
+function hideHowto(slotId) {
+  const panel = document.getElementById('howto-' + slotId);
+  if (panel) panel.classList.remove('visible');
+}
+
+function toggleHowto(slotId) {
+  const slot = document.getElementById(slotId);
+  const select = slot.querySelector('select');
+  const panel = document.getElementById('howto-' + slotId);
+  const day = slot.dataset.day, meal = slot.dataset.meal;
+  const idx = parseInt(select.value);
+  const recipe = RECIPES[state.campoutType][meal][idx];
+  panel.innerHTML = `<strong>${recipe.name} — Cooking Instructions:</strong><br>${recipe.howto}`;
+  panel.classList.toggle('visible');
+}
+
+function captureMeals() {
+  state.meals = {};
+  document.querySelectorAll('.meal-slot').forEach(slot => {
+    const d = slot.dataset.day;
+    const m = slot.dataset.meal;
+    const enabled = slot.querySelector('input[type="checkbox"]').checked;
+    const idx = parseInt(slot.querySelector('select').value);
+    const recipe = RECIPES[state.campoutType][m][idx];
+    if (!state.meals[d]) state.meals[d] = {};
+    state.meals[d][m] = { enabled, recipe };
+  });
+}
+
+function buildMenuReview() {
+  const out = document.getElementById('menuReview');
+  const typeLabel = state.campoutType === 'backpacking' ? 'Back Packing'
+                  : state.campoutType === 'carcamping' ? 'Car Camping' : 'Day Camping';
+  let html = `<h3>⚜ ${state.patrolName ? state.patrolName + ' — ' : ''}${typeLabel} · ${state.people} Scouts · ${state.days} day(s) ⚜</h3>`;
+
+  for (let d = 1; d <= state.days; d++) {
+    html += `<div class="day-block"><div class="day-header">⚜ Day ${d} ⚜</div>`;
+    ['Breakfast', 'Lunch', 'Dinner'].forEach(meal => {
+      const m = state.meals[d] && state.meals[d][meal];
+      if (m && m.enabled) {
+        html += `<div class="recipe-card">
+          <span class="recipe-meal">${meal}</span>
+          <span class="recipe-name">${m.recipe.name}</span>
+          <div class="recipe-instructions"><strong>How to cook:</strong> ${m.recipe.howto}</div>
+        </div>`;
+      } else {
+        html += `<p style="opacity:0.5; padding:8px 12px;"><em>${meal} — skipped</em></p>`;
+      }
+    });
+    html += `</div>`;
+  }
+  out.innerHTML = html;
+}
+
+function buildShoppingList() {
+  const out = document.getElementById('shoppingOutput');
+  const people = state.people;
+  const ingredientCounts = {};
+
+  for (let d in state.meals) {
+    for (let m in state.meals[d]) {
+      const meal = state.meals[d][m];
+      if (meal.enabled) {
+        const ings = meal.recipe.ingredients || [];
+        ings.forEach(ing => {
+          ingredientCounts[ing] = (ingredientCounts[ing] || 0) + 1;
+        });
+      }
+    }
+  }
+
+  const foodItems = Object.keys(ingredientCounts).sort().map(ing => {
+    const count = ingredientCounts[ing];
+    const portion = `(serves ${people}${count > 1 ? ` × ${count} meals` : ''})`;
+    return `${ing} <em style="color:#888; font-size:0.9em;">${portion}</em>`;
+  });
+
+  const typeLabel = state.campoutType === 'backpacking' ? 'Back Packing'
+                  : state.campoutType === 'carcamping' ? 'Car Camping' : 'Day Camping';
+
+  let html = `<h3>⚜ ${state.patrolName ? state.patrolName + ' · ' : ''}${typeLabel} · ${state.people} Scouts · ${state.days} day(s) ⚜</h3>`;
+
+  if (state.diets.length || state.otherAllergies) {
+    html += `<div class="quote" style="background:#ffe;">
+      <strong>⚠ Quartermaster's Alert:</strong> Check every label for:
+      ${state.diets.map(d => `<span class="summary-tag">${d}</span>`).join(' ')}
+      ${state.otherAllergies ? `<span class="summary-tag" style="background:var(--scout-red);">${state.otherAllergies}</span>` : ''}
+    </div>`;
+  }
+
+  html += `<div class="shopping-section">
+    <h3>🍖 Food & Ingredients</h3>
+    <ul class="shopping-list">${foodItems.map(f => `<li>${f}</li>`).join('')}</ul>
+  </div>`;
+
+  const disp = DISPOSABLES[state.campoutType] || [];
+  html += `<div class="shopping-section">
+    <h3>🧻 Disposables & Consumables</h3>
+    <ul class="shopping-list">${disp.map(d => `<li>${d}</li>`).join('')}</ul>
+  </div>`;
+
+  // ===== Patrol Box / Kitchen Gear interactive checklist =====
+  let gearItems, gearTitle, gearIcon, gearIntro;
+  if (state.campoutType === 'carcamping') {
+    gearItems = PATROL_BOX;
+    gearTitle = "Patrol Box Needs — Quartermaster's Checklist";
+    gearIcon = "📦";
+    gearIntro = "Click each box to confirm the item is present, clean, and in working order. Checked items will print with a strikethrough so the Patrol can see at a glance what's still missing.";
+  } else if (state.campoutType === 'backpacking') {
+    gearItems = [
+      "Backpacking stove (Jetboil, MSR PocketRocket, etc.)",
+      "Fuel canisters (isobutane) — 1 per 3-4 Scouts per trip",
+      "Pot (titanium or aluminum, 1L+)",
+      "Long-handled spork or spoon (one per Scout)",
+      "Insulated mug / cup",
+      "Water filter or purification tablets",
+      "Bear bag / Ursack + 50 ft paracord (PCT hang method)",
+      "Lighter + backup waterproof matches",
+      "Pocket knife / multi-tool",
+      "Bandana (pot grip / washcloth)",
+      "Trowel (cat-hole digging)",
+      "Stuff sack — kitchen / food bag",
+      "Repair kit (duct tape, zip ties)",
+      "Camp soap (biodegradable, Dr. Bronner's)"
+    ];
+    gearTitle = "Backpacking Kitchen Needs — Crew Gear Checklist";
+    gearIcon = "🎒";
+    gearIntro = "Confirm each item is packed before the Patrol hits the trailhead. Tap the box to mark it ready.";
+  } else {
+    gearItems = [
+      "Cooler w/ ice (for perishables)",
+      "Water jug (5-gallon, with spigot)",
+      "Portable grill or access to camp pavilion",
+      "Charcoal or propane fuel",
+      "Serving utensils (tongs, spoons, ladle)",
+      "Cutting board & chef's knife",
+      "Disposable tablecloth",
+      "Trash can liner / bags",
+      "First aid kit",
+      "Hand sanitizer / wash station",
+      "Lighter or matches",
+      "Pot holders / oven mitts",
+      "Paper towel roll",
+      "Sharpie (label dishes/items)"
+    ];
+    gearTitle = "Day Camp Kitchen Kit — Quartermaster's Checklist";
+    gearIcon = "🧺";
+    gearIntro = "Tap each box as you pack it into the patrol vehicle.";
+  }
+
+  html += `<div class="shopping-section patrol-box-section" style="background:#fff8e1; border-color:var(--scout-gold);">
+    <h3 style="color:var(--scout-olive-dark);">${gearIcon} ${gearTitle} <span class="patrol-counter" id="patrolCounter">0 / ${gearItems.length} packed</span></h3>
+    <p style="margin-bottom:10px;"><em>${gearIntro}</em></p>
+    <ul class="patrol-checklist">${gearItems.map((p, i) => `
+      <li><label><input type="checkbox" id="pbox-${i}" onchange="updatePatrolCounter(${gearItems.length})"> <span>${p}</span></label></li>
+    `).join('')}</ul>
+  </div>`;
+
+  html += `<div class="shopping-section" style="background:#f7f4ea;">
+    <h3 style="color:var(--scout-olive-dark);">📖 Full Recipe Card (print with the shopping list)</h3>`;
+  for (let d = 1; d <= state.days; d++) {
+    html += `<h4 style="color:var(--scout-red); font-family:'Copperplate',serif; letter-spacing:1px; margin-top:12px;">⚜ Day ${d} ⚜</h4>`;
+    ['Breakfast', 'Lunch', 'Dinner'].forEach(meal => {
+      const m = state.meals[d] && state.meals[d][meal];
+      if (m && m.enabled) {
+        html += `<div class="recipe-card">
+          <span class="recipe-meal">${meal}</span>
+          <span class="recipe-name">${m.recipe.name}</span>
+          <div class="recipe-instructions"><strong>How to cook:</strong> ${m.recipe.howto}</div>
+        </div>`;
+      }
+    });
+  }
+  html += `</div>`;
+
+  html += `<div class="prayer" style="margin-top:24px;">
+    <span class="prayer-title">☆ The Wilderness Grace ☆</span>
+    Thank you, Lord, for this meal,<br>
+    For the hands that gathered, packed, and prepared it,<br>
+    For the trail beneath our boots and the sky above,<br>
+    For every Scout in this Patrol.<br>
+    Bless this food, bless our journey.<br>
+    <em>— Amen —</em>
+  </div>`;
+
+  out.innerHTML = html;
+}
+
+function resetAll() {
+  state = { campoutType: null, people: 8, days: 2, patrolName: "", diets: [], otherAllergies: "", meals: {} };
+  document.querySelectorAll('.campout-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('peopleCount').value = 8;
+  document.getElementById('tripLength').value = 2;
+  document.getElementById('patrolName').value = '';
+  document.getElementById('otherAllergies').value = '';
+  document.querySelectorAll('.diet-check input').forEach(i => i.checked = false);
+  goToStep(1);
+}
+
+/* === Update Patrol Box counter === */
+function updatePatrolCounter(total) {
+  const counter = document.getElementById('patrolCounter');
+  if (!counter) return;
+  const checked = document.querySelectorAll('.patrol-checklist input[type="checkbox"]:checked').length;
+  counter.textContent = `${checked} / ${total} packed`;
+  if (checked === total) {
+    counter.style.background = 'var(--scout-red)';
+    counter.textContent = `⚜ ${checked} / ${total} — Ready to roll! ⚜`;
+  } else {
+    counter.style.background = 'var(--scout-olive)';
+  }
+}
+
+/* === Sync checkbox 'checked' attribute so innerHTML preserves state === */
+function syncCheckboxStates(rootEl) {
+  rootEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    if (cb.checked) cb.setAttribute('checked', 'checked');
+    else cb.removeAttribute('checked');
+  });
+}
+
+/* =============== PRINT =============== */
+function doPrint() {
+  const shoppingEl = document.getElementById('shoppingOutput');
+  if (!shoppingEl || !shoppingEl.innerHTML.trim()) {
+    alert("⚜ No shopping list to print yet, Scout — generate your menu first.");
+    return;
+  }
+
+  // Preserve checkbox states into HTML attributes so they survive innerHTML serialization
+  syncCheckboxStates(shoppingEl);
+
+  const typeLabel = state.campoutType === 'backpacking' ? 'Back Packing'
+                  : state.campoutType === 'carcamping' ? 'Car Camping'
+                  : state.campoutType === 'daycamping' ? 'Day Camping' : 'Menu';
+  const patrol = state.patrolName ? state.patrolName + ' — ' : '';
+  const content = shoppingEl.innerHTML;
+
+  const w = window.open('', '_blank', 'width=900,height=1000');
+  if (!w) {
+    alert("⚜ Popup blocked. Please allow popups for this page, or press Ctrl+P / Cmd+P to print.");
+    return;
+  }
+
+  w.document.open();
+  w.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Menu Planner — Quartermaster's Sheet</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, 'Palatino Linotype', serif; color: #000; background: #fff; padding: 0.4in; max-width: 7.5in; margin: 0 auto; line-height: 1.45; }
+  h1 { text-align: center; font-family: 'Copperplate', Georgia, serif; color: #4a5d23; border-bottom: 3px double #d4a017; padding-bottom: 10px; letter-spacing: 2px; margin: 0 0 16px; }
+  h3 { color: #ce1126; border-bottom: 2px dashed #d4a017; padding-bottom: 6px; margin-top: 18px; font-family: 'Copperplate', Georgia, serif; letter-spacing: 1px; }
+  h4 { color: #ce1126; font-family: 'Copperplate', Georgia, serif; letter-spacing: 1px; margin: 14px 0 6px; }
+  p { margin: 6px 0; }
+  em { color: #555; }
+  .shopping-list { columns: 2; column-gap: 30px; list-style: none; padding: 0; margin: 6px 0; }
+  .shopping-list li { padding: 3px 0 3px 22px; position: relative; break-inside: avoid; font-size: 0.95em; }
+  .shopping-list li::before { content: "☐"; position: absolute; left: 0; color: #4a5d23; font-size: 1.2em; line-height: 1; }
+  .recipe-card { border: 1px solid #ccc; border-left: 5px solid #d4a017; padding: 10px 14px; margin: 10px 0; background: #fffdf6; page-break-inside: avoid; border-radius: 4px; }
+  .recipe-card .recipe-meal { color: #ce1126; font-weight: bold; font-family: 'Copperplate', serif; letter-spacing: 1px; font-size: 0.9em; }
+  .recipe-card .recipe-name { font-size: 1.05em; font-weight: bold; color: #2f3d16; display: block; margin: 4px 0; }
+  .recipe-card .recipe-instructions { color: #333; margin-top: 6px; font-size: 0.92em; line-height: 1.5; }
+  .shopping-section { border: 1px solid #bbb; padding: 12px 16px; margin: 14px 0; page-break-inside: avoid; border-radius: 4px; background: #fff; }
+  .prayer { background: #faf5e6; border: 1px solid #c9b682; padding: 12px 16px; margin: 12px 0; text-align: center; font-style: italic; border-radius: 4px; page-break-inside: avoid; }
+  .prayer .prayer-title { display: block; font-family: 'Copperplate', serif; font-style: normal; color: #ce1126; letter-spacing: 2px; margin-bottom: 6px; font-size: 0.85em; }
+  .quote { background: #f5ecd7; border-left: 5px solid #ce1126; padding: 10px 14px; margin: 12px 0; font-style: italic; page-break-inside: avoid; border-radius: 4px; }
+  .quote strong { color: #ce1126; font-style: normal; }
+  .summary-tag { display: inline-block; background: #eee; border: 1px solid #888; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; margin: 2px; color: #333; }
+  ul { padding-left: 0; }
+  .patrol-checklist { list-style: none; padding: 0; columns: 2; column-gap: 30px; margin: 6px 0; }
+  .patrol-checklist li { break-inside: avoid; padding: 3px 0; font-size: 0.93em; }
+  .patrol-checklist label { display: flex; align-items: flex-start; gap: 8px; }
+  .patrol-checklist input[type="checkbox"] { margin-top: 3px; width: 14px; height: 14px; flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; accent-color: #4a5d23; }
+  .patrol-checklist input[type="checkbox"]:checked + span { text-decoration: line-through; color: #777; font-style: italic; }
+  .patrol-counter { display: inline-block; background: #4a5d23; color: #f5ecd7; padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-left: 6px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @media print { @page { margin: 0.5in; } body { padding: 0; max-width: none; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+</style>
+</head>
+<body>
+<h1>⚜ My Menu Planner ⚜<br>
+<span style="font-size:0.55em; font-style:italic; color:#5c3a21; font-weight:normal; letter-spacing:0;">${patrol}${typeLabel} · ${state.days} day(s) · ${state.people} Scouts</span>
+<br><span style="font-size:0.45em; color:#888; letter-spacing:1px; font-weight:normal;">☆ BE PREPARED · THE QUARTERMASTER'S SHEET ☆</span></h1>
+${content}
+<hr style="margin-top:30px; border: 0; border-top: 1px dashed #888;">
+<p style="text-align:center; font-size:0.85em; color:#666; margin-top:10px; font-style:italic;">⚜ "On my honor, I will do my best..." — Leave it better than you found it. ⚜</p>
+<script>
+  window.onload = function() {
+    setTimeout(function() { window.focus(); window.print(); }, 300);
+  };
+</` + `script>
+</body>
+</html>`);
+  w.document.close();
+}
+
+/* =============== PDF EXPORT =============== */
+function doPDF() {
+  if (typeof html2pdf === 'undefined') {
+    alert("⚜ PDF library did not load (check your internet connection). You can still use the Print button and choose 'Save as PDF' in the dialog.");
+    return;
+  }
+
+  const step4 = document.getElementById('step4');
+  // Sync checkbox states so they're preserved in the cloned HTML
+  syncCheckboxStates(step4);
+  const clone = step4.cloneNode(true);
+  // Remove all action buttons & button rows from the clone
+  clone.querySelectorAll('.btn-row, button').forEach(el => el.remove());
+
+  // Build a clean printable container
+  const typeLabel = state.campoutType === 'backpacking' ? 'Back Packing'
+                  : state.campoutType === 'carcamping' ? 'Car Camping'
+                  : state.campoutType === 'daycamping' ? 'Day Camping' : 'Menu';
+  const patrol = state.patrolName ? state.patrolName + ' — ' : '';
+
+  const container = document.createElement('div');
+  container.style.cssText = 'padding:0.3in; background:#ffffff; color:#000; font-family:Georgia,serif; width:8.0in;';
+  container.innerHTML = `
+    <div style="text-align:center; border-bottom:3px double #d4a017; padding-bottom:10px; margin-bottom:16px;">
+      <div style="font-size:28px; color:#d4a017;">⚜</div>
+      <h1 style="font-family:'Copperplate',Georgia,serif; color:#4a5d23; letter-spacing:3px; text-transform:uppercase; margin:6px 0; font-size:22px;">My Menu Planner</h1>
+      <div style="font-style:italic; color:#5c3a21;">${patrol}${typeLabel} · ${state.people} Scouts · ${state.days} day(s)</div>
+      <div style="font-size:0.85em; color:#888; margin-top:4px;">☆ Be Prepared — The Quartermaster's Sheet ☆</div>
+    </div>
+  `;
+  container.appendChild(clone);
+
+  // Attach off-screen (visible but hidden from user — needed for html2canvas)
+  container.style.position = 'fixed';
+  container.style.left = '-10000px';
+  container.style.top = '0';
+  document.body.appendChild(container);
+
+  const filename = ((state.patrolName || 'Scout-Patrol') + '-Menu-Shopping-List')
+    .replace(/[^a-zA-Z0-9\-_]/g, '_') + '.pdf';
+
+  const opt = {
+    margin: [0.4, 0.4, 0.5, 0.4],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: '.shopping-section, .recipe-card, .prayer, .quote' }
+  };
+
+  html2pdf().set(opt).from(container).save()
+    .then(() => { if (container.parentNode) document.body.removeChild(container); })
+    .catch((err) => {
+      if (container.parentNode) document.body.removeChild(container);
+      alert("PDF generation failed: " + (err && err.message ? err.message : err) + "\nTry the Print button instead and select 'Save as PDF'.");
+    });
+}
+</script>
+
+</body>
+</html>
