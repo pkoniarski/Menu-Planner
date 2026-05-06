@@ -1,0 +1,26 @@
+{
+  "type": "menu-planner-custom-recipes",
+  "version": 1,
+  "exportedAt": "2026-05-06T20:39:44.444Z",
+  "troopName": "joe",
+  "recipes": {
+    "carcamping": {
+      "Lunch": [
+        {
+          "name": "🏕️ Chili with Vienna Sausages",
+          "violates": [
+            "vegetarian",
+            "pescatarian",
+            "halal"
+          ],
+          "howto": "Warm up the two ingredients in a pot.",
+          "ingredients": [
+            "1 can of chili",
+            "1 can of Vienna Sausages"
+          ],
+          "custom": true
+        }
+      ]
+    }
+  }
+}
