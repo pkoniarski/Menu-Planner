@@ -768,7 +768,7 @@
 
         <div class="recipe-toolbar">
           <strong>🏕️ Troop Recipe Library</strong>
-          <p style="font-size:0.9em; color:#555; margin: 6px 0 8px;">⭐ Canonical recipes are pulled from <code>troop-recipes.json</code> on GitHub — Sync adds new ones to your library, never duplicates. 🏕️ Personal recipes save in your browser. Edit either kind in <strong>Manage</strong>. Use <strong>Export JSON</strong> to commit your full library back to the repo.</p>
+          <p style="font-size:0.9em; color:#555; margin: 6px 0 8px;">Add your Patrol's signature dishes — they save in your browser and appear in the meal dropdowns alongside the built-ins, marked with 🏕️. Use <strong>Export JSON</strong> to save a copy to your computer (or email it to another troop). Use <strong>Import JSON</strong> to load a file from another troop into your library.</p>
           <div class="toolbar-buttons">
             <button class="btn" type="button" onclick="openRecipeModal()">➕ Add Recipe</button>
             <button class="btn btn-secondary" type="button" onclick="openManageModal()">📋 Manage</button>
@@ -776,9 +776,7 @@
             <label class="btn btn-gold" style="cursor:pointer; margin:0;">📥 Import JSON
               <input type="file" accept=".json,application/json" style="display:none;" onchange="importRecipes(this)">
             </label>
-            <button class="btn btn-secondary" type="button" onclick="loadRepoRecipes(true)">🔄 Sync from GitHub</button>
           </div>
-          <div id="syncStatus" style="margin-top:10px; font-size:0.85em; font-style:italic;"></div>
         </div>
 
         <p style="margin-bottom: 10px;"><strong>Quartermaster's note:</strong> Uncheck any meal the Patrol plans to skip. Tap "View Recipe" to see cooking instructions. Greyed-out options violate your selected dietary restrictions.</p>
@@ -860,13 +858,13 @@
         <label><input type="checkbox" name="rcpCampout" value="daycamping"> 🌲 Day Camping</label>
       </div>
 
-      <label for="rcpMeal">Meal Slot</label>
-      <select id="rcpMeal">
-        <option value="Breakfast">Breakfast</option>
-        <option value="Lunch">Lunch</option>
-        <option value="Dinner">Dinner</option>
-        <option value="Dessert">Dessert (Car Camping only)</option>
-      </select>
+      <label>Meal Slot(s) <span style="font-weight:normal; text-transform:none; letter-spacing:0; font-size:0.85em; color:#666;">(check all that apply — recipe will appear in each)</span></label>
+      <div class="radio-row">
+        <label><input type="checkbox" name="rcpMeal" value="Breakfast"> Breakfast</label>
+        <label><input type="checkbox" name="rcpMeal" value="Lunch"> Lunch</label>
+        <label><input type="checkbox" name="rcpMeal" value="Dinner"> Dinner</label>
+        <label><input type="checkbox" name="rcpMeal" value="Dessert"> Dessert <span style="color:#888; font-size:0.85em;">(Car Camping only)</span></label>
+      </div>
 
       <label for="rcpHowto">Cooking Instructions</label>
       <textarea id="rcpHowto" required placeholder="Step-by-step directions: ingredients, prep, coal counts for Dutch ovens, cook times, etc."></textarea>
@@ -1913,106 +1911,40 @@ function countCustomRecipes(allObj) {
   return n;
 }
 
-/* ============ TROOP REPO RECIPES (fetched from GitHub, append-only into localStorage) ============ */
-const REPO_RECIPES_URL = './troop-recipes.json';
-let _repoSyncStatus = 'idle';   // idle | loading | ok | error
-let _lastSyncMessage = '';       // populated after each sync, shown in #syncStatus
-
-function updateSyncStatusUI() {
-  const indicator = document.getElementById('syncStatus');
-  if (!indicator) return;
-  const map = {
-    idle:    '',
-    loading: '⏳ Syncing from GitHub...',
-    ok:      _lastSyncMessage || '✓ Synced with GitHub',
-    error:   '⚠ Sync unavailable — opening as file://, repo offline, or no troop-recipes.json yet'
-  };
-  indicator.textContent = map[_repoSyncStatus] || '';
-  indicator.style.color = _repoSyncStatus === 'error' ? '#888' : 'var(--scout-olive-dark)';
-}
-
-async function loadRepoRecipes(showAlert) {
-  _repoSyncStatus = 'loading';
-  updateSyncStatusUI();
-  try {
-    const url = REPO_RECIPES_URL + '?_=' + Date.now(); // cache-bust
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    const data = await response.json();
-    const incoming = (data && data.recipes) ? data.recipes : data;
-    if (!incoming || typeof incoming !== 'object') throw new Error('Not a recipe object');
-
-    const coreName = (n) => String(n || '').replace(/^[⭐🏕️]\s*/, '').trim().toLowerCase();
-    let added = 0, skipped = 0;
-
-    for (const campout in incoming) {
-      if (!['backpacking','carcamping','daycamping'].includes(campout)) continue;
-      const meals = incoming[campout];
-      if (!meals || typeof meals !== 'object') continue;
-      for (const meal in meals) {
-        if (!Array.isArray(meals[meal])) continue;
-        for (const r of meals[meal]) {
-          if (!r || !r.name) continue;
-          const cleanName = String(r.name).replace(/^[⭐🏕️]\s*/, '');
-          const targetCore = coreName(cleanName);
-
-          // Has this recipe already been added to local library? (by core-name match)
-          const localList = getCustomRecipes(campout, meal);
-          if (localList.some(lr => coreName(lr.name) === targetCore)) {
-            skipped++;
-            continue;
-          }
-
-          const recipe = {
-            name: '⭐ ' + cleanName,
-            violates: Array.isArray(r.violates) ? r.violates : [],
-            howto: r.howto || '',
-            ingredients: Array.isArray(r.ingredients) ? r.ingredients : [],
-            custom: true,
-            repoRecipe: true
-          };
-          addCustomRecipe(campout, meal, recipe);
-          added++;
-        }
-      }
-    }
-
-    _repoSyncStatus = 'ok';
-    if (added === 0 && skipped === 0) {
-      _lastSyncMessage = '✓ Synced from GitHub — troop-recipes.json is empty';
-    } else if (added === 0) {
-      _lastSyncMessage = `✓ Up to date — ${skipped} GitHub recipe${skipped !== 1 ? 's' : ''} already in your library`;
-    } else {
-      _lastSyncMessage = `✓ Synced from GitHub: ${added} new ⭐ recipe${added !== 1 ? 's' : ''} added` + (skipped ? `, ${skipped} already had` : '');
-    }
-    updateSyncStatusUI();
-
-    if (showAlert) {
-      if (added === 0 && skipped === 0) {
-        alert('Sync complete: troop-recipes.json is empty.');
-      } else if (added === 0) {
-        alert(`✓ Already up to date.\nAll ${skipped} GitHub recipe${skipped !== 1 ? 's are' : ' is'} already in your library — no new ones to add.`);
-      } else {
-        alert(`✓ Synced from GitHub!\n• ${added} new recipe${added !== 1 ? 's' : ''} added (marked with ⭐)\n• ${skipped} already in your library (skipped)`);
-      }
-    }
-    if (document.getElementById('step2') && document.getElementById('step2').classList.contains('active')) buildDayBlocks();
-    if (document.getElementById('manageModal') && document.getElementById('manageModal').classList.contains('visible')) buildManageList();
-  } catch (e) {
-    _repoSyncStatus = 'error';
-    updateSyncStatusUI();
-    if (showAlert) {
-      alert(`Could not sync from GitHub:\n${e.message}\n\nThis is expected if:\n• You opened the HTML file directly (file://) — host on GitHub Pages instead\n• The repo has no troop-recipes.json yet — export your library and commit one\n• You're offline`);
-    }
-  }
-}
-
-/* Merge built-in + custom recipes for a slot. Both ⭐ canonical
-   and 🏕️ personal recipes live in localStorage now. */
+/* Merge built-in + custom recipes for a slot. */
 function getAllRecipesForSlot(campoutType, meal) {
   const builtIn = (RECIPES[campoutType] && RECIPES[campoutType][meal]) || [];
   const custom = getCustomRecipes(campoutType, meal);
   return [...builtIn, ...custom];
+}
+
+/* Strip ⭐ and 🏕️ source-prefixes (iteratively, in case of stacked prefixes from earlier bugs).
+   Other emojis at the start of the name (like 🥩, 🌱) are preserved. */
+function stripRecipePrefix(name) {
+  let s = String(name || '');
+  while (s.match(/^(⭐|🏕️)/u)) {
+    s = s.replace(/^(⭐|🏕️)\s*/u, '');
+  }
+  return s.trim();
+}
+
+/* Find every (campout, meal, recipe) instance in localStorage that shares a clean name.
+   Used by Manage to show one row per unique recipe regardless of meal slot or campout. */
+function findAllInstancesByCleanName(cleanNameLower) {
+  const all = getAllCustomRecipes();
+  const out = [];
+  for (const campout of ['backpacking','carcamping','daycamping']) {
+    if (!all[campout]) continue;
+    for (const meal of ['Breakfast','Lunch','Dinner','Dessert']) {
+      if (!all[campout][meal]) continue;
+      all[campout][meal].forEach(recipe => {
+        if (stripRecipePrefix(recipe.name).toLowerCase() === cleanNameLower) {
+          out.push({ campout, meal, recipe });
+        }
+      });
+    }
+  }
+  return out;
 }
 
 /* ============ Recipe Modal Form ============ */
@@ -2031,32 +1963,32 @@ function openRecipeModal() {
   }
   document.getElementById('recipeModal').classList.add('visible');
 }
-function openEditModal(campout, meal, name) {
-  const allCustom = getAllCustomRecipes();
-  const list = (allCustom[campout] && allCustom[campout][meal]) || [];
-  const recipe = list.find(r => r.name === name);
-  if (!recipe) { alert('Recipe not found.'); return; }
+function openEditByKey(cleanNameLower) {
+  const instances = findAllInstancesByCleanName(cleanNameLower);
+  if (instances.length === 0) { alert('Recipe not found.'); return; }
 
-  // Find every campout where this exact-name recipe exists for the same meal slot
-  const campoutsWithRecipe = [];
-  for (const c of ['backpacking','carcamping','daycamping']) {
-    if (allCustom[c] && allCustom[c][meal] && allCustom[c][meal].some(r => r.name === name)) {
-      campoutsWithRecipe.push(c);
-    }
-  }
-  _editingContext = { campouts: campoutsWithRecipe, meal: meal, originalName: name };
+  // Use the first instance as the template (all instances should be identical content)
+  const recipe = instances[0].recipe;
+  const campoutsWithRecipe = [...new Set(instances.map(i => i.campout))];
+  const mealsWithRecipe = [...new Set(instances.map(i => i.meal))];
+
+  // Edit context tracks every instance so we can delete them all on save
+  _editingContext = { instances: instances };
 
   closeManageModal();
   const form = document.getElementById('recipeForm');
   form.reset();
 
-  // Strip prefix for editing — user sees and edits the recipe's actual name
-  const cleanName = name.replace(/^[⭐🏕️]\s*/, '');
+  // Strip ⭐/🏕️ prefixes so the user sees the actual recipe name
+  const cleanName = stripRecipePrefix(recipe.name);
   document.getElementById('rcpName').value = cleanName;
   document.querySelectorAll('input[name="rcpCampout"]').forEach(cb => {
     cb.checked = campoutsWithRecipe.includes(cb.value);
   });
-  document.getElementById('rcpMeal').value = meal;
+  // Pre-check every meal slot the recipe currently lives in
+  document.querySelectorAll('input[name="rcpMeal"]').forEach(cb => {
+    cb.checked = mealsWithRecipe.includes(cb.value);
+  });
   document.getElementById('rcpHowto').value = recipe.howto || '';
   document.getElementById('rcpIngredients').value = (recipe.ingredients || []).join('\n');
   document.querySelectorAll('input[name="violates"]').forEach(cb => {
@@ -2075,7 +2007,7 @@ function submitRecipeForm(e) {
   e.preventDefault();
   const name = document.getElementById('rcpName').value.trim();
   const campouts = Array.from(document.querySelectorAll('input[name="rcpCampout"]:checked')).map(cb => cb.value);
-  const meal = document.getElementById('rcpMeal').value;
+  const meals = Array.from(document.querySelectorAll('input[name="rcpMeal"]:checked')).map(cb => cb.value);
   const howto = document.getElementById('rcpHowto').value.trim();
   const ingredientsRaw = document.getElementById('rcpIngredients').value.trim();
   const ingredients = ingredientsRaw.split('\n').map(s => s.trim()).filter(Boolean);
@@ -2089,20 +2021,18 @@ function submitRecipeForm(e) {
     alert("Please check at least one campout type.");
     return;
   }
-  if (meal === 'Dessert' && !campouts.includes('carcamping')) {
-    if (!confirm("Dessert is only used for Car Camping. This recipe will be saved to the selected campout(s) but the dessert slot only appears in Car Camping menus. Save anyway?")) return;
+  if (meals.length === 0) {
+    alert("Please check at least one meal slot.");
+    return;
+  }
+  if (meals.includes('Dessert') && !campouts.includes('carcamping')) {
+    if (!confirm("Dessert only appears in Car Camping menus. This recipe will still be saved to whichever campout(s) you checked, but its Dessert version only shows up in Car Camping. Save anyway?")) return;
   }
 
-  // Preserve the original prefix when editing (⭐ canonical stays canonical, 🏕️ stays personal).
-  // For new recipes, default to 🏕️ unless the user typed an emoji prefix in already.
-  let prefixed;
-  if (_editingContext) {
-    const m = _editingContext.originalName.match(/^([⭐🏕️])/);
-    const origPrefix = m ? m[1] + ' ' : '🏕️ ';
-    prefixed = (name.startsWith('🏕️') || name.startsWith('⭐')) ? name : origPrefix + name;
-  } else {
-    prefixed = (name.startsWith('🏕️') || name.startsWith('⭐')) ? name : '🏕️ ' + name;
-  }
+  // Always strip any source-prefix the user may have typed in, then add a single 🏕️.
+  // This prevents stacked prefixes like "🏕️⭐ ..." that came from earlier sync logic.
+  const userClean = stripRecipePrefix(name);
+  const prefixed = '🏕️ ' + userClean;
 
   const recipe = {
     name: prefixed,
@@ -2113,22 +2043,26 @@ function submitRecipeForm(e) {
   };
 
   const wasEditing = !!_editingContext;
-  // If editing, remove the original from every campout it was in (it may move to fewer/different campouts now)
-  if (_editingContext) {
-    _editingContext.campouts.forEach(c => {
-      deleteCustomRecipe(c, _editingContext.meal, _editingContext.originalName);
+  // If editing, remove EVERY existing instance of the recipe — across every campout AND meal slot.
+  // (Handles legacy stacked-prefix duplicates and recipes that ended up in multiple meal slots.)
+  if (_editingContext && Array.isArray(_editingContext.instances)) {
+    _editingContext.instances.forEach(inst => {
+      deleteCustomRecipe(inst.campout, inst.meal, inst.recipe.name);
     });
   }
 
-  // Save to every selected campout type
-  campouts.forEach(c => addCustomRecipe(c, meal, recipe));
+  // Save the recipe to every (campout × meal) combination the user selected
+  campouts.forEach(c => {
+    meals.forEach(m => addCustomRecipe(c, m, recipe));
+  });
 
   _editingContext = null;
   document.getElementById('recipeModal').classList.remove('visible');
   const labels = { backpacking: 'Back Packing', carcamping: 'Car Camping', daycamping: 'Day Camping' };
   const campoutNames = campouts.map(c => labels[c]).join(', ');
+  const mealsStr = meals.join(', ');
   const verb = wasEditing ? 'updated' : 'saved';
-  alert(`✓ Recipe "${name}" ${verb} in ${campoutNames}. It appears in the ${meal.toLowerCase()} dropdowns for those trips.`);
+  alert(`✓ Recipe "${name}" ${verb} in ${campoutNames} for ${mealsStr}.`);
   if (document.getElementById('step2').classList.contains('active')) buildDayBlocks();
 }
 
@@ -2143,45 +2077,89 @@ function closeManageModal() {
 function buildManageList() {
   const container = document.getElementById('customRecipeList');
   const all = getAllCustomRecipes();
-  const total = countCustomRecipes(all);
-  if (total === 0) {
-    container.innerHTML = '<p style="text-align:center; color:#666; padding:20px;"><em>No custom recipes saved yet. Click <strong>➕ Add Recipe</strong> to start your troop\'s collection.</em></p>';
-    return;
-  }
-  let html = `<p style="margin-bottom:14px;"><strong>${total} custom recipe${total !== 1 ? 's' : ''}</strong> saved on this device.</p>`;
-  const labels = { backpacking: '🥾 Back Packing', carcamping: '🏕️ Car Camping', daycamping: '🌲 Day Camping' };
+
+  // Aggregate every recipe instance by clean name only — one row per unique recipe across ALL meal slots and campouts
+  const aggregated = {};
   for (const campout of ['backpacking','carcamping','daycamping']) {
     if (!all[campout]) continue;
     for (const meal of ['Breakfast','Lunch','Dinner','Dessert']) {
-      if (!all[campout][meal] || all[campout][meal].length === 0) continue;
-      html += `<h4 style="color:var(--scout-red); margin-top:14px; font-family:'Copperplate',serif; letter-spacing:1px;">${labels[campout]} — ${meal}</h4>`;
+      if (!all[campout][meal]) continue;
       all[campout][meal].forEach(recipe => {
-        const safeName = recipe.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        html += `<div class="custom-recipe-row">
-          <span>${recipe.name}</span>
-          <div style="display:flex; gap:6px;">
-            <button class="edit-btn" type="button" onclick="openEditModal('${campout}','${meal}','${safeName}')">✏️ Edit</button>
-            <button class="delete-btn" type="button" onclick="confirmDeleteCustom('${campout}','${meal}','${safeName}')">🗑 Delete</button>
-          </div>
-        </div>`;
+        const cleanName = stripRecipePrefix(recipe.name);
+        const key = cleanName.toLowerCase();
+        if (!aggregated[key]) {
+          aggregated[key] = { cleanNameLower: key, displayRecipe: recipe, instances: [] };
+        }
+        aggregated[key].instances.push({ campout, meal, recipe });
       });
     }
   }
+
+  const entries = Object.values(aggregated).sort((a, b) =>
+    stripRecipePrefix(a.displayRecipe.name).localeCompare(stripRecipePrefix(b.displayRecipe.name))
+  );
+
+  if (entries.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:#666; padding:20px;"><em>No recipes in your library yet. Click <strong>➕ Add Recipe</strong> to start your troop\'s collection, or <strong>📥 Import JSON</strong> to load a file shared by another troop.</em></p>';
+    return;
+  }
+
+  const campoutLabel = { backpacking: '🥾 Back Packing', carcamping: '🏕️ Car Camping', daycamping: '🌲 Day Camping' };
+
+  let html = `<p style="margin-bottom:14px;"><strong>${entries.length} recipe${entries.length !== 1 ? 's' : ''}</strong> in your library on this device. Each appears once below — Edit and Delete update every meal slot and campout type the recipe lives in.</p>`;
+
+  entries.forEach(entry => {
+    // Group instances by meal slot so the badge for "Dinner — Car Camping, Day Camping" stays grouped
+    const byMeal = {};
+    entry.instances.forEach(inst => {
+      if (!byMeal[inst.meal]) byMeal[inst.meal] = [];
+      byMeal[inst.meal].push(inst.campout);
+    });
+    let badges = '';
+    for (const meal of ['Breakfast','Lunch','Dinner','Dessert']) {
+      if (!byMeal[meal]) continue;
+      const uniqueCampouts = [...new Set(byMeal[meal])];
+      const campoutStr = uniqueCampouts.map(c => campoutLabel[c]).join(' · ');
+      badges += `<span style="background:var(--scout-tan); border:1px solid var(--scout-khaki); padding:2px 8px; border-radius:10px; font-size:0.78em; margin: 0 4px 4px 0; display:inline-block; color:var(--scout-olive-dark);"><strong>${meal}</strong> — ${campoutStr}</span>`;
+    }
+
+    const safeKey = entry.cleanNameLower.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += `<div class="custom-recipe-row">
+      <div>
+        <div>${entry.displayRecipe.name}</div>
+        <div style="margin-top:4px;">${badges}</div>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="edit-btn" type="button" onclick="openEditByKey('${safeKey}')">✏️ Edit</button>
+        <button class="delete-btn" type="button" onclick="confirmDeleteByKey('${safeKey}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  });
   container.innerHTML = html;
 }
-function confirmDeleteCustom(campout, meal, name) {
-  if (confirm(`Delete custom recipe "${name}"? This cannot be undone.`)) {
-    deleteCustomRecipe(campout, meal, name);
-    buildManageList();
-    if (document.getElementById('step2').classList.contains('active')) buildDayBlocks();
-  }
+function confirmDeleteByKey(cleanNameLower) {
+  const instances = findAllInstancesByCleanName(cleanNameLower);
+  if (instances.length === 0) return;
+
+  const display = stripRecipePrefix(instances[0].recipe.name);
+  const allMeals = [...new Set(instances.map(i => i.meal))];
+  const allCampouts = [...new Set(instances.map(i => i.campout))];
+  const description = `${allMeals.join('/')} in ${allCampouts.length} campout type${allCampouts.length !== 1 ? 's' : ''}`;
+  const ok = confirm(`Delete "${display}" from ${description}? This cannot be undone.`);
+  if (!ok) return;
+
+  instances.forEach(inst => {
+    deleteCustomRecipe(inst.campout, inst.meal, inst.recipe.name);
+  });
+  buildManageList();
+  if (document.getElementById('step2').classList.contains('active')) buildDayBlocks();
 }
 
 /* ============ JSON Export / Import ============ */
 function exportRecipes() {
   const all = getAllCustomRecipes();
   if (countCustomRecipes(all) === 0) {
-    alert("⚜ No custom recipes to export yet, Scout. Add some first!");
+    alert("⚜ No recipes to export yet, Scout. Add some with ➕ Add Recipe first.");
     return;
   }
   const data = {
@@ -2189,6 +2167,7 @@ function exportRecipes() {
     version: 1,
     exportedAt: new Date().toISOString(),
     troopName: state.patrolName || "Troop",
+    troopNumber: getTroopNumber(),
     recipes: all
   };
   const json = JSON.stringify(data, null, 2);
@@ -2196,9 +2175,10 @@ function exportRecipes() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const dateStamp = new Date().toISOString().slice(0,10);
-  const safeTroop = (state.patrolName || 'troop').replace(/[^a-zA-Z0-9\-_]/g, '_');
+  const troopNum = getTroopNumber();
+  const namePart = troopNum ? `troop-${troopNum}` : (state.patrolName || 'troop').replace(/[^a-zA-Z0-9\-_]/g, '_');
   a.href = url;
-  a.download = `${safeTroop}-recipes-${dateStamp}.json`;
+  a.download = `${namePart}-recipes-${dateStamp}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -2258,16 +2238,11 @@ document.addEventListener('click', function(e) {
   }
 });
 
-/* On page load: restore troop number + silently sync recipes from GitHub repo */
-function pageInit() {
-  loadTroopNumber();
-  // Don't show alert on initial silent sync — only show via the manual button
-  loadRepoRecipes(false);
-}
+/* On page load: restore troop number from localStorage */
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', pageInit);
+  document.addEventListener('DOMContentLoaded', loadTroopNumber);
 } else {
-  pageInit();
+  loadTroopNumber();
 }
 
 function goToStep(n) {
