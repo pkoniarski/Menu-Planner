@@ -863,7 +863,7 @@
         <label><input type="checkbox" name="rcpMeal" value="Breakfast"> Breakfast</label>
         <label><input type="checkbox" name="rcpMeal" value="Lunch"> Lunch</label>
         <label><input type="checkbox" name="rcpMeal" value="Dinner"> Dinner</label>
-        <label><input type="checkbox" name="rcpMeal" value="Dessert"> Dessert <span style="color:#888; font-size:0.85em;">(Car Camping only)</span></label>
+        <label><input type="checkbox" name="rcpMeal" value="Dessert"> Dessert</label>
       </div>
 
       <label for="rcpHowto">Cooking Instructions</label>
@@ -1163,6 +1163,38 @@ const RECIPES = {
       { name: "🐟 Smoked Salmon & Rice Bowl", violates: ["vegetarian","vegan"],
         howto: "Cook instant rice. Top with smoked salmon packet, dried seaweed strips, and tamari (gluten-free soy sauce). Pescatarian, dairy-free, GF, nut-free.",
         ingredients: ["Instant rice", "Smoked salmon packets", "Dried seaweed strips", "Tamari packets"] }
+    ],
+    Dessert: [
+      { name: "🍫 Hot Cocoa & Marshmallows", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Boil 1 cup water per Scout. Stir in cocoa packet. Float mini marshmallows on top. Sip slowly while watching the stars — the classic backcountry nightcap.",
+        ingredients: ["Hot cocoa packets", "Mini marshmallows"] },
+      { name: "🍪 Toasted Pop-Tart S'mores", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Toast a Pop-Tart over a low stove flame on foil 30 seconds per side. Split horizontally, add a roasted marshmallow and a piece of chocolate. Press together. The trail s'more.",
+        ingredients: ["Pop-Tarts", "Marshmallows", "Chocolate squares"] },
+      { name: "🍫 Trail Mix Chocolate Crunch", violates: ["nut-allergy","dairy-free"],
+        howto: "Combine M&Ms, peanuts, granola, and dried cranberries in a bag. Snack handful by handful around the campfire.",
+        ingredients: ["M&Ms", "Peanuts", "Granola", "Dried cranberries"] },
+      { name: "🥜 Peanut Butter & Honey Crackers", violates: ["nut-allergy","gluten-free"],
+        howto: "Spread peanut butter on graham crackers, drizzle with honey. Top with a second cracker to make sandwich cookies.",
+        ingredients: ["Graham crackers", "Peanut butter", "Honey packets"] },
+      { name: "🍫 Snickers Bar (Scout Classic)", violates: ["vegan","dairy-free","nut-allergy"],
+        howto: "Unwrap. Eat. The most calorie-dense Scout dessert known to the trail — peanuts, caramel, nougat, chocolate.",
+        ingredients: ["Snickers bars"] },
+      { name: "🥥 Coconut & Dried Fruit Mix", violates: [],
+        howto: "Mix coconut flakes, dried mango, dried pineapple, and dark chocolate chips in a bag. Eat by the handful. Vegan, GF, nut-free, dairy-free (use vegan chocolate).",
+        ingredients: ["Coconut flakes", "Dried mango", "Dried pineapple", "Dark chocolate chips (vegan)"] },
+      { name: "🥣 Instant Pudding (just-add-water)", violates: ["vegan","dairy-free"],
+        howto: "Pour pudding mix and 2 Tbsp powdered milk into a freezer bag. Add 1 cup cold water. Shake vigorously 1 min. Wait 5 min for set. Eat with spork from bag.",
+        ingredients: ["Instant pudding mix", "Powdered milk", "Freezer bags"] },
+      { name: "🍪 Brownie Bites (shelf-stable)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Open vacuum-packed brownie bites. Eat. Pair with hot cocoa for double indulgence.",
+        ingredients: ["Vacuum-packed brownie bites"] },
+      { name: "🍫 Dark Chocolate & Dried Cherries", violates: [],
+        howto: "Bring vegan dark chocolate squares and dried cherries. Eat together — like a wilderness charcuterie. Vegan, GF, nut-free, dairy-free.",
+        ingredients: ["Vegan dark chocolate squares", "Dried cherries"] },
+      { name: "🍌 Banana Chips & Chocolate Chips", violates: ["vegan","dairy-free"],
+        howto: "Mix banana chips with chocolate chips in a bag. Sweet, crunchy, energizing. Eat by the handful.",
+        ingredients: ["Banana chips", "Chocolate chips"] }
     ]
   },
   carcamping: {
@@ -1739,6 +1771,38 @@ const RECIPES = {
       { name: "🌱 Black Bean Burgers (vegan, GF)", violates: [],
         howto: "Grill vegan black bean patties 4 min per side until heated through. Serve on GF buns with avocado, lettuce, tomato, ketchup, mustard. Vegan, GF (with GF buns), nut-free, dairy-free.",
         ingredients: ["Vegan black bean burger patties", "GF buns", "Avocado", "Lettuce", "Tomato", "Ketchup", "Mustard"] }
+    ],
+    Dessert: [
+      { name: "🥧 Pre-Made Apple Pie", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pick up a bakery apple pie en route to camp. Slice and serve cold, or wrap pieces in foil and warm on the grill 10 min. Top with whipped cream if available.",
+        ingredients: ["Pre-made apple pie", "Whipped cream (optional)"] },
+      { name: "🍪 Assorted Bakery Cookies", violates: ["vegan","dairy-free","gluten-free","nut-allergy"],
+        howto: "Bring a tray of mixed bakery cookies (chocolate chip, oatmeal raisin, sugar). Set out on a plate. Easiest possible crowd-pleaser.",
+        ingredients: ["Assorted bakery cookies"] },
+      { name: "🍰 Cupcakes or Cake Slices", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pick up pre-made cupcakes or sliced cake from a bakery. Keep cool in cooler until serving.",
+        ingredients: ["Cupcakes or pre-made cake"] },
+      { name: "🍦 Ice Cream Sandwiches (cooler)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pre-pack ice cream sandwiches in a heavily iced cooler (use dry ice if the trip is long). Distribute quickly before they melt. A Scout favorite.",
+        ingredients: ["Ice cream sandwiches", "Cooler with extra ice"] },
+      { name: "🍇 Fresh Fruit Platter (vegan, GF)", violates: [],
+        howto: "Slice watermelon, pineapple, grapes, and strawberries onto a tray. Drizzle with lime juice. Serve cold from cooler. Light and refreshing after a hot day.",
+        ingredients: ["Watermelon", "Pineapple", "Grapes", "Strawberries", "Limes"] },
+      { name: "🍫 Brownies (pre-made)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Bring a pan of pre-made brownies (homemade or bakery). Cut into squares, serve. Pair with milk if you've got it cold.",
+        ingredients: ["Pre-made brownies", "Milk (optional)"] },
+      { name: "🍪 Rice Krispie Treats", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pre-made rice krispie treats. Open and serve. Marshmallow + cereal classic, no cooking required.",
+        ingredients: ["Rice krispie treats"] },
+      { name: "🔥 S'mores Kit (if fire is allowed)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Roast marshmallows over a small fire ring or grill. Sandwich with chocolate squares between two graham crackers. Press until chocolate softens. Camp dessert royalty.",
+        ingredients: ["Marshmallows", "Chocolate bars (Hershey's)", "Graham crackers", "Roasting sticks"] },
+      { name: "🍌 Build-Your-Own Banana Split Bar", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Set out: bananas (split lengthwise), ice cream tubs, chocolate sauce, sprinkles, whipped cream, maraschino cherries, chopped nuts. Each Scout builds their own. Keep ice cream on heavy ice.",
+        ingredients: ["Bananas", "Ice cream", "Chocolate sauce", "Sprinkles", "Whipped cream", "Maraschino cherries", "Chopped nuts"] },
+      { name: "🍰 Cheesecake Slices (pre-made)", violates: ["vegan","dairy-free","gluten-free"],
+        howto: "Pre-made store-bought cheesecake slices. Keep cold in cooler. Top with fresh berries and a drizzle of strawberry sauce to serve.",
+        ingredients: ["Pre-made cheesecake slices", "Fresh berries", "Strawberry sauce"] }
     ]
   }
 };
@@ -1846,10 +1910,9 @@ function selectCampout(el) {
   }
 }
 
-/* Returns meal slot order for a campout type. Car camping adds Dessert. */
+/* Returns meal slot order. Dessert is available for every campout type. */
 function getMealsForType(type) {
-  if (type === 'carcamping') return ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
-  return ['Breakfast', 'Lunch', 'Dinner'];
+  return ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
 }
 
 /* ============ TROOP NUMBER (persists in localStorage) ============ */
@@ -2024,9 +2087,6 @@ function submitRecipeForm(e) {
   if (meals.length === 0) {
     alert("Please check at least one meal slot.");
     return;
-  }
-  if (meals.includes('Dessert') && !campouts.includes('carcamping')) {
-    if (!confirm("Dessert only appears in Car Camping menus. This recipe will still be saved to whichever campout(s) you checked, but its Dessert version only shows up in Car Camping. Save anyway?")) return;
   }
 
   // Always strip any source-prefix the user may have typed in, then add a single 🏕️.
